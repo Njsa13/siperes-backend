@@ -14,10 +14,14 @@ import com.siperes.siperes.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import static com.siperes.siperes.common.util.Constants.AuthPats.AUTH_PATS;
@@ -29,6 +33,7 @@ import static com.siperes.siperes.common.util.Constants.AuthPats.AUTH_PATS;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final EmailService emailService;
+    private final LogoutHandler logoutHandler;
 
     @PostMapping("/register")
     @Schema(name = "RegisterRequest", description = "Register request body")
@@ -75,7 +80,7 @@ public class AuthenticationController {
         emailService.sendEmail(request.getEmail(), EnumEmailVerificationType.REGISTER);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
-                "Email berhasil dikirim ulang"
+                "Email verifikasi berhasil dikirim ulang"
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -91,5 +96,17 @@ public class AuthenticationController {
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/logout")
+    @Schema(name = "LogoutRequest", description = "Logout request body")
+    @Operation(summary = "Endpoint untuk logout, catatan: header juga dihapus ketika logout")
+    public ResponseEntity<APIResponse> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        logoutHandler.logout(request, response, authentication);
+        APIResponse responseDTO = new APIResponse(
+                HttpStatus.OK,
+                "Logout berhasil"
+        );
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }

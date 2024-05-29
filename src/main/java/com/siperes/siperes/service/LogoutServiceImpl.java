@@ -1,0 +1,53 @@
+package com.siperes.siperes.service;
+
+import com.siperes.siperes.exception.DataNotFoundException;
+import com.siperes.siperes.exception.MissingTokenException;
+import com.siperes.siperes.exception.ServiceBusinessException;
+import com.siperes.siperes.repository.TokenRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.stereotype.Service;
+
+import static com.siperes.siperes.common.util.Constants.ErrorMessage.*;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class LogoutServiceImpl implements LogoutHandler {
+    private final TokenRepository tokenRepository;
+
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        try {
+            final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+            final String accessToken;
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                throw new MissingTokenException("Unauthorized");
+            }
+            accessToken = authHeader.substring(7);
+            tokenRepository.findByToken(accessToken).ifPresentOrElse(
+                    token -> {
+                        token.setExpired(true);
+                        token.setRevoked(true);
+                        tokenRepository.save(token);
+                        SecurityContextHolder.clearContext();
+                    },
+                    () -> {
+                        throw new DataNotFoundException(TOKEN_NOT_FOUND);
+                    }
+            );
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Logout Failed: {}", e.getMessage());
+            throw new ServiceBusinessException(LOGOUT_FAILED);
+        }
+    }
+}

@@ -96,6 +96,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(MissingTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public APIResponse handlerMissingTokenException(MissingTokenException e) {
+        return new APIResponse(
+                HttpStatus.UNAUTHORIZED,
+                e.getMessage()
+        );
+    }
+
     @ExceptionHandler(JwtException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public APIResponse handlerJwtException(JwtException e) {

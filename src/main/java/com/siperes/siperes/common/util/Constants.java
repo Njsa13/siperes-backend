@@ -38,6 +38,7 @@ public class Constants {
         public static final String REFRESH_TOKEN_FAILED = "Gagal refresh token";
         public static final String VERIFY_EMAIL_FAILED = "Gagal menverifikasi email";
         public static final String EXTRACT_JWT_FAILED = "Gagal mengekstrak jwt";
+        public static final String LOGOUT_FAILED = "Gagal logout";
         public static final String CHECK_FIELD_EXISTS_FAILED = "Gagal mengecek keberadaan value dari field terkait";
     }
 
