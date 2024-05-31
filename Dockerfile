@@ -6,7 +6,7 @@ COPY src ./src
 
 RUN mvn package -DskipTests
 
-FROM oracle/graalvm-ce:17.0.9-java17 as final
+FROM openjdk:17-oracle
 
 COPY --from=builder /app/target/siperes-*.jar /siperes.jar
 
