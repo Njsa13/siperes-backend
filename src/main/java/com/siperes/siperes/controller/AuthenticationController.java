@@ -10,7 +10,7 @@ import com.siperes.siperes.dto.response.base.APIResponse;
 import com.siperes.siperes.dto.response.base.APIResultResponse;
 import com.siperes.siperes.enumeration.EnumEmailVerificationType;
 import com.siperes.siperes.service.AuthenticationService;
-import com.siperes.siperes.service.EmailService;
+import com.siperes.siperes.service.EmailVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +32,7 @@ import static com.siperes.siperes.common.util.Constants.AuthPats.AUTH_PATS;
 @Tag(name = "Authentication", description = "Authentication API")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    private final EmailService emailService;
+    private final EmailVerificationService emailVerificationService;
     private final LogoutHandler logoutHandler;
 
     @PostMapping("/register")
@@ -65,7 +65,7 @@ public class AuthenticationController {
     @Schema(name = "VerifyEmailRequest", description = "Verify email request body")
     @Operation(summary = "Endpoint untuk verifikasi email")
     public ResponseEntity<APIResponse> verifyEmailRegister(@RequestParam String token) {
-        emailService.verifyEmailRegister(token);
+        emailVerificationService.verifyEmailRegister(token);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
                 "Email berhasil diverifikasi"
@@ -77,7 +77,7 @@ public class AuthenticationController {
     @Schema(name = "ResendVerifyEmailRequest", description = "Resend verify email request body")
     @Operation(summary = "Endpoint untuk mengirim ulang email berisi url untuk verifikasi")
     public ResponseEntity<APIResponse> resendVerificationEmailRegister(@RequestBody @Valid ResendEmailVerificationRequest request) {
-        emailService.sendEmail(request.getEmail(), EnumEmailVerificationType.REGISTER);
+        emailVerificationService.sendEmail(request.getEmail(), EnumEmailVerificationType.REGISTER);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
                 "Email verifikasi berhasil dikirim ulang"

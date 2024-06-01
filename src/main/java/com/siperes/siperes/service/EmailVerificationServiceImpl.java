@@ -24,7 +24,7 @@ import static com.siperes.siperes.common.util.Constants.EmailMessage.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailServiceImpl implements EmailService {
+public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final UserRepository userRepository;
     private final EmailVerificationRepository emailVerificationRepository;
     private final MailUtil mailUtil;
@@ -40,7 +40,7 @@ public class EmailServiceImpl implements EmailService {
             String text;
             if (user.getIsVerifiedEmail()) {
                 if (emailVerificationType.equals(EnumEmailVerificationType.REGISTER)) {
-                    throw new ForbiddenException(USER_ALREADY_VERIFIED);
+                    throw new ForbiddenException(EMAIL_ALREADY_VERIFIED);
                 } else {
                     subject = RESET_PASSWORD_SUBJECT;
                     text = RESET_PASSWORD_TEXT + verificationUrl;
@@ -50,7 +50,7 @@ public class EmailServiceImpl implements EmailService {
                     subject = EMAIL_VERIFICATION_SUBJECT;
                     text = EMAIL_VERIFICATION_TEXT + verificationUrl;
                 } else {
-                    throw new ForbiddenException(USER_NOT_VERIFIED);
+                    throw new ForbiddenException(EMAIL_NOT_VERIFIED);
                 }
             }
             mailUtil.sendEmail(email, subject, text);
@@ -74,7 +74,7 @@ public class EmailServiceImpl implements EmailService {
                         }
                         User user = val.getUser();
                         if (user.getIsVerifiedEmail()) {
-                            throw new ForbiddenException(USER_ALREADY_VERIFIED);
+                            throw new ForbiddenException(EMAIL_ALREADY_VERIFIED);
                         }
                         user.setIsVerifiedEmail(true);
                         userRepository.save(user);

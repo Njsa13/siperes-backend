@@ -35,7 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     @Transactional
@@ -51,7 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .status(EnumStatus.ACTIVE)
                     .build();
             user = userRepository.save(user);
-            emailService.sendEmail(request.getEmail(), EnumEmailVerificationType.REGISTER);
+            emailVerificationService.sendEmail(request.getEmail(), EnumEmailVerificationType.REGISTER);
             return RegisterResponse.builder()
                     .name(user.getName())
                     .email(user.getEmail())
@@ -81,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     request.getPassword()
             ));
             if (!user.getIsVerifiedEmail()) {
-                throw new UserNotActiveException(USER_NOT_VERIFIED);
+                throw new UserNotActiveException(EMAIL_NOT_VERIFIED);
             }
             if (user.getStatus().equals(EnumStatus.INACTIVE)) {
                 throw new UserNotActiveException(INACTIVE_USER);

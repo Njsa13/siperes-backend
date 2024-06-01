@@ -23,8 +23,8 @@ public class Constants {
         public static final String USERNAME_NOT_FOUND = "Username tidak ditamukan";
         public static final String EMAIL_NOT_FOUND = "Email tidak ditamukan";
         public static final String WRONG_PASSWORD = "Password salah";
-        public static final String USER_ALREADY_VERIFIED = "User sudah diverifikasi";
-        public static final String USER_NOT_VERIFIED = "User belum diverifikasi";
+        public static final String EMAIL_ALREADY_VERIFIED = "Email sudah diverifikasi";
+        public static final String EMAIL_NOT_VERIFIED = "Email belum diverifikasi";
         public static final String TOKEN_EXPIRED = "Token kedaluwarsa";
         public static final String TOKEN_NOT_FOUND = "Token tidak ditemukan";
         public static final String TOKEN_TYPE_INVALID = "Tipe token tidak valid";
