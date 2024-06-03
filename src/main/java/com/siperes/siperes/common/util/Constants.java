@@ -40,6 +40,7 @@ public class Constants {
         public static final String EXTRACT_JWT_FAILED = "Gagal mengekstrak jwt";
         public static final String LOGOUT_FAILED = "Gagal logout";
         public static final String CHECK_FIELD_EXISTS_FAILED = "Gagal mengecek keberadaan value dari field terkait";
+        public static final String FAILED_ADD_ADMIN = "Gagal menambahkan data admin";
     }
 
     public static final class EmailMessage {
@@ -58,5 +59,6 @@ public class Constants {
         public static final String PASSWORD_MIN_CHAR = "Password minimal 6 karakter";
         public static final String NOT_BLANK = "Tidak boleh kosong";
         public static final String INVALID_EMAIL = "Format email tidak valid";
+        public static final String CANT_CONTAIN_SPACES = "Username tidak boleh mengandung spasi";
     }
 }

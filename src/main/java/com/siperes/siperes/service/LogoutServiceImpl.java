@@ -1,6 +1,8 @@
 package com.siperes.siperes.service;
 
+import com.siperes.siperes.enumeration.EnumTokenAccessType;
 import com.siperes.siperes.exception.DataNotFoundException;
+import com.siperes.siperes.exception.ForbiddenException;
 import com.siperes.siperes.exception.MissingTokenException;
 import com.siperes.siperes.exception.ServiceBusinessException;
 import com.siperes.siperes.repository.TokenRepository;
@@ -26,13 +28,16 @@ public class LogoutServiceImpl implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         try {
             final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            final String accessToken;
+            final String jwt;
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 throw new MissingTokenException("Unauthorized");
             }
-            accessToken = authHeader.substring(7);
-            tokenRepository.findByToken(accessToken).ifPresentOrElse(
+            jwt = authHeader.substring(7);
+            tokenRepository.findByToken(jwt).ifPresentOrElse(
                     token -> {
+                        if (!token.getTokenAccessType().equals(EnumTokenAccessType.ACCESS)) {
+                            throw new ForbiddenException(TOKEN_TYPE_INVALID);
+                        }
                         token.setExpired(true);
                         token.setRevoked(true);
                         tokenRepository.save(token);
@@ -42,7 +47,7 @@ public class LogoutServiceImpl implements LogoutHandler {
                         throw new DataNotFoundException(TOKEN_NOT_FOUND);
                     }
             );
-        } catch (DataNotFoundException e) {
+        } catch (DataNotFoundException | MissingTokenException | ForbiddenException e) {
             log.info(e.getMessage());
             throw e;
         } catch (Exception e) {

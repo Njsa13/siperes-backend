@@ -50,7 +50,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @Schema(name = "LoginRequest", description = "Login request body")
-    @Operation(summary = "Endpoint untuk login")
+    @Operation(summary = "Endpoint untuk login, credential dapat berupa username/email")
     public ResponseEntity<APIResultResponse<LoginResponse>> login(@RequestBody @Valid LoginRequest request) {
         LoginResponse response = authenticationService.login(request);
         APIResultResponse<LoginResponse> resultResponse = new APIResultResponse<>(
@@ -75,9 +75,9 @@ public class AuthenticationController {
 
     @PostMapping("/resend-email-verify-register")
     @Schema(name = "ResendVerifyEmailRequest", description = "Resend verify email request body")
-    @Operation(summary = "Endpoint untuk mengirim ulang email berisi url untuk verifikasi")
+    @Operation(summary = "Endpoint untuk mengirim ulang email berisi url untuk verifikasi, credential dapat berupa username/email")
     public ResponseEntity<APIResponse> resendVerificationEmailRegister(@RequestBody @Valid ResendEmailVerificationRequest request) {
-        emailVerificationService.sendEmail(request.getEmail(), EnumEmailVerificationType.REGISTER);
+        emailVerificationService.sendEmail(request.getCredential(), EnumEmailVerificationType.REGISTER);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
                 "Email verifikasi berhasil dikirim ulang"

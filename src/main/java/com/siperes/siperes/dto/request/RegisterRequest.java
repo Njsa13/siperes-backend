@@ -3,6 +3,7 @@ package com.siperes.siperes.dto.request;
 import com.siperes.siperes.validation.FieldExistence;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,7 @@ import static com.siperes.siperes.common.util.Constants.ValidationMessage.*;
 public class RegisterRequest {
     @NotBlank(message = NOT_BLANK)
     @FieldExistence(tableName = "users", fieldName = "username", shouldExist = false, message = USER_EXISTS)
+    @Pattern(regexp = "^\\S+$", message = CANT_CONTAIN_SPACES)
     private String username;
 
     @NotBlank(message = NOT_BLANK)

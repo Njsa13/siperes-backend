@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ResendEmailVerificationRequest {
     @NotBlank
-    @Email
-    private String email;
+    private String credential;
 }

@@ -31,10 +31,18 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     @Override
     @Transactional
-    public void sendEmail(String email, EnumEmailVerificationType emailVerificationType) {
+    public void sendEmail(String credential, EnumEmailVerificationType emailVerificationType) {
         try {
-            User user = userRepository.findFirstByEmail(email)
-                    .orElseThrow(() -> new DataNotFoundException(EMAIL_NOT_FOUND));
+            User user;
+            if (credential.contains("@")) {
+                user = userRepository.findFirstByEmail(credential).orElseThrow(
+                        () -> new DataNotFoundException(EMAIL_NOT_FOUND)
+                );
+            } else {
+                user = userRepository.findFirstByUsername(credential).orElseThrow(
+                        () -> new DataNotFoundException(USERNAME_NOT_FOUND)
+                );
+            }
             String verificationUrl = getVerificationUrl(emailVerificationType, user);
             String subject;
             String text;
@@ -53,7 +61,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                     throw new ForbiddenException(EMAIL_NOT_VERIFIED);
                 }
             }
-            mailUtil.sendEmail(email, subject, text);
+            mailUtil.sendEmail(user.getEmail(), subject, text);
         } catch (DataNotFoundException | ForbiddenException e) {
             log.info(e.getMessage());
             throw e;

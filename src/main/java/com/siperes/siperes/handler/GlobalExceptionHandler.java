@@ -69,6 +69,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(NotVerifiedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public APIResponse handlerNotVerifiedException(NotVerifiedException e) {
+        return new APIResponse(
+                HttpStatus.FORBIDDEN,
+                e.getMessage()
+        );
+    }
+
     @ExceptionHandler(ServiceBusinessException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public APIResponse handlerServiceBusinessException(ServiceBusinessException e) {

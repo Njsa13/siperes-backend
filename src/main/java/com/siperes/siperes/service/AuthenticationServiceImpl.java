@@ -81,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     request.getPassword()
             ));
             if (!user.getIsVerifiedEmail()) {
-                throw new UserNotActiveException(EMAIL_NOT_VERIFIED);
+                throw new NotVerifiedException(EMAIL_NOT_VERIFIED);
             }
             if (user.getStatus().equals(EnumStatus.INACTIVE)) {
                 throw new UserNotActiveException(INACTIVE_USER);
@@ -102,7 +102,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } catch (BadCredentialsException e) {
             log.info(e.getMessage());
             throw new  BadCredentialsException(WRONG_PASSWORD);
-        } catch (DataNotFoundException | UserNotActiveException e) {
+        } catch (DataNotFoundException | UserNotActiveException | NotVerifiedException e) {
             log.info(e.getMessage());
             throw e;
         } catch (Exception e) {
