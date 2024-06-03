@@ -1,33 +1,35 @@
 package com.siperes.siperes.common.config;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.Components;
 
-@SecurityScheme(
-        name = "bearerAuth",
-        description = "JWT auth description",
-        scheme = "bearer",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        in = SecuritySchemeIn.HEADER
-)
-@OpenAPIDefinition(
-        info = @Info(
-                title = "Siperes",
-                version = "v1.0.0",
-                description = "Swagger UI for Siperes"
-        ),
-        servers = @Server(url = "https://siperes-tghylc3lla-as.a.run.app"),
-        security = {
-                @SecurityRequirement(
-                        name = "bearerAuth"
-                ),
-        }
-)
+@Configuration
 public class SwaggerConfig {
+
+        @Value("${swagger.server.url}")
+        private String serverUrl;
+
+        @Bean
+        public OpenAPI customOpenAPI() {
+                return new OpenAPI()
+                        .addServersItem(new Server().url(serverUrl))
+                        .info(new Info().title("Siperes")
+                                .version("v1.0.0")
+                                .description("Swagger UI for Siperes"))
+                        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                        .components(new Components().addSecuritySchemes("bearerAuth",
+                                new SecurityScheme().name("bearerAuth")
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .in(SecurityScheme.In.HEADER)
+                                        .description("JWT auth description")));
+        }
 }
