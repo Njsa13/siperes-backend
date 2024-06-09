@@ -8,14 +8,14 @@ public class Constants {
         public static final String AUTH_PATS = BASE_URL + "/auth";
     }
 
-    public static final class TestAuth {
-        public static final String TEST_PATS = BASE_URL + "/test";
-        public static final String TEST_USER_PATS = BASE_URL + "/test/user";
-        public static final String TEST_ADMIN_PATS = BASE_URL + "/test/admin";
+    public static final class ManageRecipe {
+        public static final String MANAGE_RECIPE_PATS = BASE_URL + "/recipe";
+        public static final String MANAGE_RECIPE_PATS_ALL = MANAGE_RECIPE_PATS + "/**";
     }
 
     public static final class CommonPats {
             public static final String[] SECURE_LIST_PATS = {
+                    ManageRecipe.MANAGE_RECIPE_PATS_ALL
             };
     }
 
@@ -41,6 +41,26 @@ public class Constants {
         public static final String LOGOUT_FAILED = "Gagal logout";
         public static final String CHECK_FIELD_EXISTS_FAILED = "Gagal mengecek keberadaan value dari field terkait";
         public static final String FAILED_ADD_ADMIN = "Gagal menambahkan data admin";
+        public static final String FAILED_UPLOAD_IMG = "Gagal mengunggah gambar";
+        public static final String FAILED_UPDATE_IMG = "Gagal mengupdate gambar";
+        public static final String FAILED_DELETE_IMG = "Gagal Menghapus gambar";
+        public static final String FAILED_ADD_RECIPE = "Gagal membuat resep baru";
+        public static final String FAILED_UPDATE_RECIPE = "Gagal memperbarui resep";
+        public static final String FAILED_DELETE_RECIPE = "Gagal menghapus resep";
+        public static final String FAILED_SET_RECIPE = "Gagal mengubah pengaturan resep";
+        public static final String FAILED_GET_ALL_MY_RECIPE = "Gagal memuat semua resep saya";
+        public static final String FAILED_GET_MY_RECIPE_DETAIL = "Gagal memuat detail resep saya";
+        public static final String FAILED_GET_ALL_BOOKMARKED_RECIPE = "Gagal memuat semua resep yang di bookmark";
+        public static final String FAILED_CREATE_BOOKMARK = "Gagal melakukan bookmark pada resep";
+        public static final String FAILED_DELETE_BOOKMARK = "Gagal menghapus bookmark pada resep";
+        public static final String RECIPE_NOT_FOUND = "Resep tidak ditemukan";
+        public static final String INGREDIENT_DETAIL_NOT_FOUND = "Tidak ditemukan bahan dengan slug: ";
+        public static final String STEP_NOT_FOUND = "Tidak ditemukan langkah dengan slug: ";
+        public static final String INPUT_CANNOT_NULL = "Input tidak boleh null atau empty";
+        public static final String FAILED_CHECK_FIELD_EXISTS= "Gagal memeriksa keberadaan field";
+        public static final String FILED_GET_TWO_WORDS = "Gagal mengambil 2 huruf pertama";
+        public static final String INVALID_SLUG = "Slug tidak valid";
+        public static final String FORBIDDEN_BOOKMARK = "Tidak dapat melakukan bookmark pada resep milik sendiri";
     }
 
     public static final class EmailMessage {
@@ -48,8 +68,8 @@ public class Constants {
         public static final String RESET_PASSWORD_TEXT = "Tekan link berikut untuk reset password: ";
         public static final String EMAIL_VERIFICATION_SUBJECT = "Verifikasi Email Siperes";
         public static final String EMAIL_VERIFICATION_TEXT = "Tekan link berikut untuk verifikasi email: ";
-        public static final String RESET_PASSWORD_URL = "http://localhost:4200/email-verify-forgot-password?token=";
-        public static final String EMAIL_VERIFICATION_URL = "http://localhost:4200/email-verify-register?token=";
+        public static final String RESET_PASSWORD_URL = "https://spiceswap-svelte.vercel.app/email-verify-forgot-password?token=";
+        public static final String EMAIL_VERIFICATION_URL = "https://spiceswap-svelte.vercel.app/email-verify-register?token=";
 
     }
 
@@ -60,5 +80,10 @@ public class Constants {
         public static final String NOT_BLANK = "Tidak boleh kosong";
         public static final String INVALID_EMAIL = "Format email tidak valid";
         public static final String CANT_CONTAIN_SPACES = "Username tidak boleh mengandung spasi";
+        public static final String INVALID_BASE64_IMG = "Format gambar tidak valid";
+        public static final String INVALID_VALUE = "Nilai terlalu besar atau nilai tidak boleh desimal";
+        public static final String MAX_INGREDIENTS = "Jumlah bahan tidak boleh melebihi 50";
+        public static final String MAX_STEPS = "Jumlah langkah tidak boleh melebihi 40";
+        public static final String UNKNOWN_ENUM = "Nilai enum tidak diketahuai: ";
     }
 }
