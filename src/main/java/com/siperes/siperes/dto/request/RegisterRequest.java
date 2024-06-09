@@ -1,6 +1,8 @@
 package com.siperes.siperes.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.siperes.siperes.validation.FieldExistence;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -20,6 +22,7 @@ public class RegisterRequest {
     @NotBlank(message = NOT_BLANK)
     @FieldExistence(tableName = "users", fieldName = "username", shouldExist = false, message = USER_EXISTS)
     @Pattern(regexp = "^\\S+$", message = CANT_CONTAIN_SPACES)
+    @Schema(example = "username")
     private String username;
 
     @NotBlank(message = NOT_BLANK)

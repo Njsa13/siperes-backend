@@ -1,6 +1,7 @@
 package com.siperes.siperes.service;
 
 import com.siperes.siperes.common.util.MailUtil;
+import com.siperes.siperes.dto.request.ResendEmailVerificationRequest;
 import com.siperes.siperes.enumeration.EnumEmailVerificationType;
 import com.siperes.siperes.exception.DataNotFoundException;
 import com.siperes.siperes.exception.ForbiddenException;
@@ -67,6 +68,21 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             throw e;
         } catch (Exception e) {
             log.info("Send Email Failed: {}", e.getMessage());
+            throw new ServiceBusinessException(SEND_EMAIL_FAILED);
+        }
+    }
+
+    @Override
+    public void resendVerificationEmailRegister(String token, EnumEmailVerificationType emailVerificationType) {
+        try {
+            EmailVerification emailVerification = emailVerificationRepository.findFirstByToken(token)
+                    .orElseThrow(() -> new DataNotFoundException(REGISTER_TOKEN_NOT_FOUND));
+            sendEmail(emailVerification.getUser().getEmail(), emailVerificationType);
+        } catch (DataNotFoundException | ForbiddenException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.info("Resend Email Failed: {}", e.getMessage());
             throw new ServiceBusinessException(SEND_EMAIL_FAILED);
         }
     }

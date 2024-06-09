@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResendEmailVerificationRequest {
+public class SendEmailVerificationRequest {
     @NotBlank
-    private String token;
+    private String credential;
 }
