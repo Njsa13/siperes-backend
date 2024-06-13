@@ -23,7 +23,7 @@ import static com.siperes.siperes.common.util.Constants.BrowseRecipe.BROWSE_RECI
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = BROWSE_RECIPE_PATS , produces = "application/json")
-@Tag(name = "Manage Recipe", description = "Manage Recipe API")
+@Tag(name = "Browse Recipe", description = "Browse Recipe API")
 public class BrowseRecipeController {
     private final RecipeService recipeService;
 
