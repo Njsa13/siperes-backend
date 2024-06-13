@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MyIngredientDetailResponse {
+public class IngredientDetailResponse {
     private String ingredientDetailSlug;
     private String ingredientName;
     private String dose;

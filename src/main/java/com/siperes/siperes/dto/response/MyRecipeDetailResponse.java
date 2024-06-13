@@ -28,6 +28,6 @@ public class MyRecipeDetailResponse {
     private EnumRecipeType recipeType;
     private String copyFromSlug;
     private LocalDate createdAt;
-    private List<MyIngredientDetailResponse> myIngredientDetailResponses;
-    private List<MyStepDetailResponse> myStepDetailResponses;
+    private List<IngredientDetailResponse> ingredientDetailResponses;
+    private List<StepDetailResponse> stepDetailResponses;
 }

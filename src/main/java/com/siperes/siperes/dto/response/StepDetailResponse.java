@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MyStepDetailResponse {
+public class StepDetailResponse {
     private String stepSlug;
     private Integer numberStep;
     private String stepDescription;

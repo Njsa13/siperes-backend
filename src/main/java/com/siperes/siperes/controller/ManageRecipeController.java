@@ -148,11 +148,11 @@ public class ManageRecipeController {
     @GetMapping("/get-all-my-recipe-history/{recipeSlug}")
     @Schema(name = "GetAllMyRecipeHistoryRequest", description = "Get ALl My Recipe History request body")
     @Operation(summary = "Endpoint untuk mengambil daftar history resep milik sendiri")
-    public ResponseEntity<APIResultResponse<MyRecipeHistoryListResponse>> getAllMyRecipeHistory(@PathVariable String recipeSlug,
-                                                                                                  @RequestParam("page") Integer page) {
+    public ResponseEntity<APIResultResponse<RecipeHistoryListResponse>> getAllMyRecipeHistory(@PathVariable String recipeSlug,
+                                                                                              @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
-        MyRecipeHistoryListResponse responses = recipeService.getMyRecipeHistories(recipeSlug, pageable);
-        APIResultResponse<MyRecipeHistoryListResponse> resultResponse = new APIResultResponse<>(
+        RecipeHistoryListResponse responses = recipeService.getMyRecipeHistories(recipeSlug, pageable);
+        APIResultResponse<RecipeHistoryListResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Behasil memuat riwayat resep saya",
                 responses);

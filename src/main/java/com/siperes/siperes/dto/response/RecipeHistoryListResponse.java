@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MyRecipeHistoryListResponse {
+public class RecipeHistoryListResponse {
     private String recipeSlug;
     private String recipeName;
     private Page<RecipeHistoryResponse> historyDetailResponses;

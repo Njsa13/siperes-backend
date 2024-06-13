@@ -8,6 +8,11 @@ public class Constants {
         public static final String AUTH_PATS = BASE_URL + "/auth";
     }
 
+    public static final class BrowseRecipe {
+        public static final String BROWSE_RECIPE_PATS = BASE_URL + "/browse-recipe";
+        public static final String BROWSE_RECIPE_PATS_ALL = BROWSE_RECIPE_PATS + "/**";
+    }
+
     public static final class ManageRecipe {
         public static final String MANAGE_RECIPE_PATS = BASE_URL + "/recipe";
         public static final String MANAGE_RECIPE_PATS_ALL = MANAGE_RECIPE_PATS + "/**";
@@ -53,8 +58,10 @@ public class Constants {
         public static final String FAILED_GET_ALL_BOOKMARKED_RECIPE = "Gagal memuat semua resep yang di bookmark";
         public static final String FAILED_CREATE_BOOKMARK = "Gagal melakukan bookmark pada resep";
         public static final String FAILED_DELETE_BOOKMARK = "Gagal menghapus bookmark pada resep";
-        public static final String FAILED_GET_MY_RECIPE_HISTORIES = "Gagal memuat riwayat resep";
+        public static final String FAILED_GET_RECIPE_HISTORIES = "Gagal memuat riwayat resep";
         public static final String FAILED_GET_RECIPE_HISTORY_DETAIL = "Gagal memuat detail riwayat resep";
+        public static final String FAILED_GET_RECIPE_LIST = "Gagal memuat daftar resep";
+        public static final String FAILED_GET_RECIPE_DETAIL = "Gagal memuat detail resep";
         public static final String RECIPE_NOT_FOUND = "Resep tidak ditemukan";
         public static final String RECIPE_HISTORY_NOT_FOUND = "Riwayat resep tidak ditemukan";
         public static final String RECIPE_HISTORY_DETAIL_NOT_FOUND = "Detail riwayat resep tidak ditemukan";
