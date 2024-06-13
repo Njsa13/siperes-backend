@@ -1,5 +1,6 @@
 package com.siperes.siperes.model;
 
+import com.siperes.siperes.model.json.RecipeDetailJson;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -25,13 +25,16 @@ public class RecipeHistory {
     @Column(name = "recipe_history_id")
     private UUID id;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "ingredient_details", columnDefinition = "jsonb")
-    private List<IngredientDetail> ingredientDetails;
+    @Column(name = "slug_history", unique = true, nullable = false)
+    private String historySlug;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "steps", columnDefinition = "jsonb")
-    private List<Step> steps;
+    @Column(name = "previous_recipe", columnDefinition = "jsonb")
+    private RecipeDetailJson previousRecipe;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "current_recipe", columnDefinition = "jsonb")
+    private RecipeDetailJson currentRecipe;
 
     @Column(name = "created_by", nullable = false)
     private String createdBy;

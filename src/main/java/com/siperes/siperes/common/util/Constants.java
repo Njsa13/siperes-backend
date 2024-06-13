@@ -53,7 +53,11 @@ public class Constants {
         public static final String FAILED_GET_ALL_BOOKMARKED_RECIPE = "Gagal memuat semua resep yang di bookmark";
         public static final String FAILED_CREATE_BOOKMARK = "Gagal melakukan bookmark pada resep";
         public static final String FAILED_DELETE_BOOKMARK = "Gagal menghapus bookmark pada resep";
+        public static final String FAILED_GET_MY_RECIPE_HISTORIES = "Gagal memuat riwayat resep";
+        public static final String FAILED_GET_RECIPE_HISTORY_DETAIL = "Gagal memuat detail riwayat resep";
         public static final String RECIPE_NOT_FOUND = "Resep tidak ditemukan";
+        public static final String RECIPE_HISTORY_NOT_FOUND = "Riwayat resep tidak ditemukan";
+        public static final String RECIPE_HISTORY_DETAIL_NOT_FOUND = "Detail riwayat resep tidak ditemukan";
         public static final String INGREDIENT_DETAIL_NOT_FOUND = "Tidak ditemukan bahan dengan slug: ";
         public static final String STEP_NOT_FOUND = "Tidak ditemukan langkah dengan slug: ";
         public static final String INPUT_CANNOT_NULL = "Input tidak boleh null atau empty";

@@ -1,24 +1,21 @@
 package com.siperes.siperes.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @Builder
+@EqualsAndHashCode(exclude = "recipe")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "steps")
-public class Step implements Serializable {
+public class Step {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "step_id")

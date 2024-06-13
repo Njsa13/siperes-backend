@@ -27,7 +27,7 @@ public class Ingredient {
     @Column(name = "ingredient_name", nullable = false, unique = true)
     private String ingredientName;
 
-    @Column(name = "image_link")
+    @Column(name = "image_link", nullable = false)
     private String imageLink;
 
     @CreationTimestamp
@@ -36,6 +36,12 @@ public class Ingredient {
     @UpdateTimestamp
     private LocalDateTime updateAt;
 
-    @OneToMany(mappedBy = "ingredient", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "ingredient", cascade =  {CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Set<IngredientDetail> ingredientDetails;
+
+    @PrePersist
+    @PreUpdate
+    public void convertToLowerCase() {
+        this.ingredientName = this.ingredientName.toLowerCase();
+    }
 }

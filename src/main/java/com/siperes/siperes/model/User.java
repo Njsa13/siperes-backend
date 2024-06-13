@@ -3,10 +3,7 @@ package com.siperes.siperes.model;
 import com.siperes.siperes.enumeration.EnumRole;
 import com.siperes.siperes.enumeration.EnumStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +16,7 @@ import java.util.UUID;
 
 @Data
 @Builder
+@EqualsAndHashCode(of = "username")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

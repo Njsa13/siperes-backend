@@ -36,8 +36,11 @@ public class Recipe {
     @Column(nullable = false, columnDefinition = "text")
     private String about;
 
-    @Column(name = "thumbnail_image_link")
+    @Column(name = "thumbnail_image_link", nullable = false)
     private String thumbnailImageLink;
+
+    @Column(nullable = false)
+    private Integer portion;
 
     @Column(name = "total_rating", nullable = false)
     private Double totalRating;
@@ -60,13 +63,13 @@ public class Recipe {
     @UpdateTimestamp
     private LocalDateTime updateAt;
 
-    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<IngredientDetail> ingredientDetails;
 
-    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Step> steps;
 
-    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<RecipeHistory> recipeHistories;
 
     @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
@@ -75,7 +78,7 @@ public class Recipe {
     @OneToMany(mappedBy = "originalRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Set<CopyDetail> originalRecipeCopyDetails;
 
-    @OneToMany(mappedBy = "copyRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "copyRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Set<CopyDetail> copyRecipeCopyDetails;
 
     @ManyToOne
@@ -84,4 +87,10 @@ public class Recipe {
 
     @ManyToMany(mappedBy = "bookmarks")
     private Set<User> bookmarks;
+
+    @PrePersist
+    @PreUpdate
+    public void convertToLowerCase() {
+        this.recipeName = this.recipeName.toLowerCase();
+    }
 }
