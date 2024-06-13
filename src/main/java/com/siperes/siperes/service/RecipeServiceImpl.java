@@ -24,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -519,8 +522,8 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeType(recipe.getRecipeType())
                     .copyFromSlug(copyFromSlug)
                     .createdAt(recipe.getCreatedAt().toLocalDate())
-                    .myIngredientDetailResponses(recipe.getIngredientDetails().stream()
-                            .map(ingredientDetail -> MyIngredientDetailResponse.builder()
+                    .ingredientDetailResponses(recipe.getIngredientDetails().stream()
+                            .map(ingredientDetail -> IngredientDetailResponse.builder()
                                     .ingredientDetailSlug(ingredientDetail.getIngredientDetailSlug())
                                     .ingredientName(ingredientDetail.getIngredientName())
                                     .dose(ingredientDetail.getDose())
@@ -531,15 +534,15 @@ public class RecipeServiceImpl implements RecipeService {
                                                     .build())
                                             .orElse(null))
                                     .build())
-                            .sorted(Comparator.comparing(MyIngredientDetailResponse::getIngredientName))
+                            .sorted(Comparator.comparing(IngredientDetailResponse::getIngredientName))
                             .collect(Collectors.toList()))
-                    .myStepDetailResponses(recipe.getSteps().stream()
-                            .map(step -> MyStepDetailResponse.builder()
+                    .stepDetailResponses(recipe.getSteps().stream()
+                            .map(step -> StepDetailResponse.builder()
                                     .stepSlug(step.getStepSlug())
                                     .numberStep(step.getNumberStep())
                                     .stepDescription(step.getStepDescription())
                                     .build())
-                            .sorted(Comparator.comparingInt(MyStepDetailResponse::getNumberStep))
+                            .sorted(Comparator.comparingInt(StepDetailResponse::getNumberStep))
                             .collect(Collectors.toList()))
                     .build();
         } catch (DataNotFoundException e) {
@@ -576,12 +579,13 @@ public class RecipeServiceImpl implements RecipeService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public MyRecipeHistoryListResponse getMyRecipeHistories(String recipeSlug, Pageable pageable) {
+    public RecipeHistoryListResponse getMyRecipeHistories(String recipeSlug, Pageable pageable) {
         try {
             User user = jwtUtil.getUser();
             Recipe recipe = recipeRepository.findFirstByRecipeSlugAndUserAndStatus(recipeSlug, user, EnumStatus.ACTIVE)
-                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_NOT_FOUND));
             Page<RecipeHistory> recipeHistoryPage = Optional.of(recipeHistoryRepository.findByRecipe(recipe, pageable))
                     .filter(Page::hasContent)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_NOT_FOUND));
@@ -591,7 +595,7 @@ public class RecipeServiceImpl implements RecipeService {
                             .updateAt(recipeHistory.getCreatedAt().toLocalDate())
                             .updatedBy(recipeHistory.getCreatedBy())
                             .build());
-            return MyRecipeHistoryListResponse.builder()
+            return RecipeHistoryListResponse.builder()
                     .recipeSlug(recipe.getRecipeSlug())
                     .recipeName(recipe.getRecipeName())
                     .historyDetailResponses(responsePage)
@@ -601,17 +605,18 @@ public class RecipeServiceImpl implements RecipeService {
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(FAILED_GET_MY_RECIPE_HISTORIES);
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_HISTORIES);
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public RecipeHistoryDetailResponse getMyRecipeHistoryDetail(String historySlug) {
         try {
             User user = jwtUtil.getUser();
             RecipeHistory recipeHistory = recipeHistoryRepository.findFirstByHistorySlug(historySlug)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_DETAIL_NOT_FOUND));
-            if (!recipeHistory.getRecipe().getUser().equals(user)) {
+            if (!recipeHistory.getRecipe().getUser().equals(user) || recipeHistory.getRecipe().getStatus().equals(EnumStatus.INACTIVE)) {
                 throw new DataNotFoundException(RECIPE_HISTORY_DETAIL_NOT_FOUND);
             }
             return RecipeHistoryDetailResponse.builder()
@@ -674,6 +679,146 @@ public class RecipeServiceImpl implements RecipeService {
             log.error(e.getMessage());
             throw new ServiceBusinessException(FAILED_DELETE_BOOKMARK);
         }
+    }
+
+    @Override
+    public List<RecipeResponse> getRecipeList() {
+        try {
+            List<Recipe> recipes = Optional.ofNullable(recipeRepository.findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, EnumRecipeType.ORIGINAL))
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            Boolean isLogin = checkLogin();
+            return recipes.stream()
+                    .map(recipe -> RecipeResponse.builder()
+                            .recipeSlug(recipe.getRecipeSlug())
+                            .recipeName(recipe.getRecipeName())
+                            .thumbnailImageLink(recipe.getThumbnailImageLink())
+                            .totalRating(recipe.getTotalRating())
+                            .createdAt(recipe.getCreatedAt().toLocalDate())
+                            .canBookmark(isLogin)
+                            .build())
+                    .collect(Collectors.toList());
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_LIST);
+        }
+    }
+
+    @Override
+    public RecipeDetailResponse getRecipeDetail(String recipeSlug) {
+        try {
+            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatusAndVisibility(recipeSlug, EnumStatus.ACTIVE, EnumVisibility.PUBLIC)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            String copyFromSlug = null;
+            if (Objects.equals(recipe.getRecipeType(), EnumRecipeType.COPY)) {
+                Optional<CopyDetail> copyDetail = recipe.getCopyRecipeCopyDetails().stream().findFirst();
+                if (copyDetail.isPresent()) {
+                    copyFromSlug = copyDetail.get().getOriginalRecipe().getRecipeSlug();
+                }
+            }
+            Boolean isLogin = checkLogin();
+            return RecipeDetailResponse.builder()
+                    .recipeSlug(recipe.getRecipeSlug())
+                    .recipeName(recipe.getRecipeName())
+                    .about(recipe.getAbout())
+                    .thumbnailImageLink(recipe.getThumbnailImageLink())
+                    .owner(recipe.getUser().getUsername())
+                    .portion(recipe.getPortion())
+                    .totalRating(recipe.getTotalRating())
+                    .recipeType(recipe.getRecipeType())
+                    .copyFromSlug(copyFromSlug)
+                    .createdAt(recipe.getCreatedAt().toLocalDate())
+                    .canBookmark(isLogin)
+                    .canCopy(isLogin)
+                    .ingredientDetailResponses(recipe.getIngredientDetails().stream()
+                            .map(ingredientDetail -> IngredientDetailResponse.builder()
+                                    .ingredientDetailSlug(ingredientDetail.getIngredientDetailSlug())
+                                    .ingredientName(ingredientDetail.getIngredientName())
+                                    .dose(ingredientDetail.getDose())
+                                    .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
+                                            .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientName(ingredient.getIngredientName())
+                                                    .imageLink(ingredient.getImageLink())
+                                                    .build())
+                                            .orElse(null))
+                                    .build())
+                            .sorted(Comparator.comparing(IngredientDetailResponse::getIngredientName))
+                            .collect(Collectors.toList()))
+                    .stepDetailResponses(recipe.getSteps().stream()
+                            .map(step -> StepDetailResponse.builder()
+                                    .stepSlug(step.getStepSlug())
+                                    .numberStep(step.getNumberStep())
+                                    .stepDescription(step.getStepDescription())
+                                    .build())
+                            .sorted(Comparator.comparingInt(StepDetailResponse::getNumberStep))
+                            .collect(Collectors.toList()))
+                    .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_DETAIL);
+        }
+    }
+
+    @Override
+    public RecipeHistoryListResponse getRecipeHistories(String recipeSlug, Pageable pageable) {
+        try {
+            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatusAndVisibility(recipeSlug, EnumStatus.ACTIVE, EnumVisibility.PUBLIC)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_NOT_FOUND));
+            Page<RecipeHistory> recipeHistoryPage = Optional.of(recipeHistoryRepository.findByRecipe(recipe, pageable))
+                    .filter(Page::hasContent)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_NOT_FOUND));
+            Page<RecipeHistoryResponse> responsePage = recipeHistoryPage
+                    .map(recipeHistory -> RecipeHistoryResponse.builder()
+                            .slugHistory(recipeHistory.getHistorySlug())
+                            .updateAt(recipeHistory.getCreatedAt().toLocalDate())
+                            .updatedBy(recipeHistory.getCreatedBy())
+                            .build());
+            return RecipeHistoryListResponse.builder()
+                    .recipeSlug(recipe.getRecipeSlug())
+                    .recipeName(recipe.getRecipeName())
+                    .historyDetailResponses(responsePage)
+                    .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_HISTORIES);
+        }
+    }
+
+    @Override
+    public RecipeHistoryDetailResponse getRecipeHistoryDetail(String historySlug) {
+        try {
+            RecipeHistory recipeHistory = recipeHistoryRepository.findFirstByHistorySlug(historySlug)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_DETAIL_NOT_FOUND));
+            if (recipeHistory.getRecipe().getStatus().equals(EnumStatus.INACTIVE)) {
+                throw new DataNotFoundException(RECIPE_HISTORY_DETAIL_NOT_FOUND);
+            }
+            return RecipeHistoryDetailResponse.builder()
+                    .historySlug(recipeHistory.getHistorySlug())
+                    .updateBy(recipeHistory.getHistorySlug())
+                    .updatedAt(recipeHistory.getCreatedAt().toLocalDate())
+                    .previousRecipe(recipeHistory.getPreviousRecipe())
+                    .currentRecipe(recipeHistory.getCurrentRecipe())
+                    .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_HISTORY_DETAIL);
+        }
+    }
+
+    private Boolean checkLogin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
     }
 
     private Ingredient getIngredientIfExists(String ingredientName) {

@@ -7,6 +7,8 @@ import com.siperes.siperes.dto.response.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface RecipeService {
     CreateRecipeResponse addRecipe(CreateRecipeRequest recipeRequest);
     UpdateRecipeResponse updateRecipe(String recipeSlug, UpdateRecipeRequest recipeRequest);
@@ -17,8 +19,12 @@ public interface RecipeService {
     Page<MyRecipeResponse> getAllMyRecipes(Pageable pageable);
     MyRecipeDetailResponse getMyRecipeDetail(String recipeSlug);
     Page<RecipeResponse> getAllBookmarkedRecipes(Pageable pageable);
-    MyRecipeHistoryListResponse getMyRecipeHistories(String recipeSlug, Pageable pageable);
+    RecipeHistoryListResponse getMyRecipeHistories(String recipeSlug, Pageable pageable);
     RecipeHistoryDetailResponse getMyRecipeHistoryDetail(String historySlug);
     void createBookmark(String recipeSlug);
     void deleteBookmark(String recipeSlug);
+    List<RecipeResponse> getRecipeList();
+    RecipeDetailResponse getRecipeDetail(String recipeSlug);
+    RecipeHistoryListResponse getRecipeHistories(String recipeSlug, Pageable pageable);
+    RecipeHistoryDetailResponse getRecipeHistoryDetail(String historySlug);
 }
