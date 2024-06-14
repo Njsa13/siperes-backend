@@ -10,6 +10,7 @@ import com.siperes.siperes.dto.request.UpdateIngredientDetailRequest;
 import com.siperes.siperes.dto.request.UpdateRecipeRequest;
 import com.siperes.siperes.dto.response.*;
 import com.siperes.siperes.enumeration.EnumRecipeType;
+import com.siperes.siperes.enumeration.EnumSortBy;
 import com.siperes.siperes.enumeration.EnumStatus;
 import com.siperes.siperes.enumeration.EnumVisibility;
 import com.siperes.siperes.exception.DataNotFoundException;
@@ -20,10 +21,12 @@ import com.siperes.siperes.model.json.IngredientDetailJson;
 import com.siperes.siperes.model.json.RecipeDetailJson;
 import com.siperes.siperes.model.json.StepJson;
 import com.siperes.siperes.repository.*;
+import com.siperes.siperes.repository.specification.RecipeSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -122,6 +125,7 @@ public class RecipeServiceImpl implements RecipeService {
                                     .createdAt(ingredientDetail.getCreatedAt())
                                     .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
                                             .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientSlug(ingredient.getIngredientSlug())
                                                     .ingredientName(ingredient.getIngredientName())
                                                     .imageLink(ingredient.getImageLink())
                                                     .build())
@@ -225,6 +229,7 @@ public class RecipeServiceImpl implements RecipeService {
                                     .updatedAt(ingredientDetail.getUpdateAt())
                                     .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
                                             .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientSlug(ingredient.getIngredientSlug())
                                                     .ingredientName(ingredient.getIngredientName())
                                                     .imageLink(ingredient.getImageLink())
                                                     .build())
@@ -247,7 +252,6 @@ public class RecipeServiceImpl implements RecipeService {
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            e.printStackTrace();
             throw new ServiceBusinessException(FAILED_UPDATE_RECIPE);
         }
     }
@@ -398,6 +402,7 @@ public class RecipeServiceImpl implements RecipeService {
                                     .updatedAt(ingredientDetail.getUpdateAt())
                                     .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
                                             .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientSlug(ingredient.getIngredientSlug())
                                                     .ingredientName(ingredient.getIngredientName())
                                                     .imageLink(ingredient.getImageLink())
                                                     .build())
@@ -457,9 +462,7 @@ public class RecipeServiceImpl implements RecipeService {
                         recipeHistoryRepository.deleteByRecipeId(recipe.getId());
                         recipeRepository.delete(recipe);
                         Optional.ofNullable(recipe.getThumbnailImageLink())
-                                .ifPresent(image -> {
-                                    imageUtil.deleteImage(recipe.getThumbnailImageLink());
-                                });
+                                .ifPresent(image -> imageUtil.deleteImage(recipe.getThumbnailImageLink()));
                     }, () -> {
                         throw new DataNotFoundException(RECIPE_NOT_FOUND);
                     });
@@ -529,6 +532,7 @@ public class RecipeServiceImpl implements RecipeService {
                                     .dose(ingredientDetail.getDose())
                                     .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
                                             .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientSlug(ingredient.getIngredientSlug())
                                                     .ingredientName(ingredient.getIngredientName())
                                                     .imageLink(ingredient.getImageLink())
                                                     .build())
@@ -739,6 +743,7 @@ public class RecipeServiceImpl implements RecipeService {
                                     .dose(ingredientDetail.getDose())
                                     .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
                                             .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientSlug(ingredient.getIngredientSlug())
                                                     .ingredientName(ingredient.getIngredientName())
                                                     .imageLink(ingredient.getImageLink())
                                                     .build())
@@ -807,6 +812,42 @@ public class RecipeServiceImpl implements RecipeService {
                     .previousRecipe(recipeHistory.getPreviousRecipe())
                     .currentRecipe(recipeHistory.getCurrentRecipe())
                     .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_HISTORY_DETAIL);
+        }
+    }
+
+    @Override
+    public Page<RecipeResponse> searchAndSortingRecipe(String keyword, EnumSortBy sortBy, Pageable pageable) {
+        try {
+            Specification<Recipe> specification = Specification.where(RecipeSpecification.hasRecipeNameOrIngredientName(keyword));
+            if (sortBy != null) {
+                if (sortBy.equals(EnumSortBy.NEWEST)) {
+                    specification = specification.and(RecipeSpecification.orderByCreatedAt(false));
+                }
+                if (sortBy.equals(EnumSortBy.OLDEST)) {
+                    specification = specification.and(RecipeSpecification.orderByCreatedAt(true));
+                }
+                if (sortBy.equals(EnumSortBy.POPULAR)) {
+                    specification = specification.and(RecipeSpecification.orderByRating());
+                }
+            }
+            Page<Recipe> recipePage = Optional.of(recipeRepository.findAll(specification, pageable))
+                    .filter(Page::hasContent)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            Boolean isLogin = checkLogin();
+            return recipePage.map(recipe -> RecipeResponse.builder()
+                    .recipeSlug(recipe.getRecipeSlug())
+                    .recipeName(recipe.getRecipeName())
+                    .thumbnailImageLink(recipe.getThumbnailImageLink())
+                    .totalRating(recipe.getTotalRating())
+                    .createdAt(recipe.getCreatedAt().toLocalDate())
+                    .canBookmark(isLogin)
+                    .build());
         } catch (DataNotFoundException e) {
             log.info(e.getMessage());
             throw e;

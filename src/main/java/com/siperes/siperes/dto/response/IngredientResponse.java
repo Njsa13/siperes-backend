@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IngredientResponse {
+    private String ingredientSlug;
     private String ingredientName;
     private String imageLink;
 }

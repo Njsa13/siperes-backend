@@ -10,7 +10,6 @@ public class Constants {
 
     public static final class BrowseRecipe {
         public static final String BROWSE_RECIPE_PATS = BASE_URL + "/browse-recipe";
-        public static final String BROWSE_RECIPE_PATS_ALL = BROWSE_RECIPE_PATS + "/**";
     }
 
     public static final class ManageRecipe {
@@ -62,11 +61,16 @@ public class Constants {
         public static final String FAILED_GET_RECIPE_HISTORY_DETAIL = "Gagal memuat detail riwayat resep";
         public static final String FAILED_GET_RECIPE_LIST = "Gagal memuat daftar resep";
         public static final String FAILED_GET_RECIPE_DETAIL = "Gagal memuat detail resep";
+        public static final String FAILED_CREATE_INGREDIENT = "Gagal menambahkan bahan";
+        public static final String FAILED_UPDATE_INGREDIENT = "Gagal memperbarui bahan";
+        public static final String FAILED_DELETE_INGREDIENT = "Gagal menghapus bahan";
+        public static final String FAILED_GET_INGREDIENT_LIST = "Gagal memuat daftar bahan";
         public static final String RECIPE_NOT_FOUND = "Resep tidak ditemukan";
         public static final String RECIPE_HISTORY_NOT_FOUND = "Riwayat resep tidak ditemukan";
         public static final String RECIPE_HISTORY_DETAIL_NOT_FOUND = "Detail riwayat resep tidak ditemukan";
         public static final String INGREDIENT_DETAIL_NOT_FOUND = "Tidak ditemukan bahan dengan slug: ";
         public static final String STEP_NOT_FOUND = "Tidak ditemukan langkah dengan slug: ";
+        public static final String INGREDIENT_NOT_FOUND = "Bahan tidak ditemukan";
         public static final String INPUT_CANNOT_NULL = "Input tidak boleh null atau empty";
         public static final String FAILED_CHECK_FIELD_EXISTS= "Gagal memeriksa keberadaan field";
         public static final String FILED_GET_TWO_WORDS = "Gagal mengambil 2 huruf pertama";
@@ -96,5 +100,6 @@ public class Constants {
         public static final String MAX_INGREDIENTS = "Jumlah bahan tidak boleh melebihi 50";
         public static final String MAX_STEPS = "Jumlah langkah tidak boleh melebihi 40";
         public static final String UNKNOWN_ENUM = "Nilai enum tidak diketahuai: ";
+        public static final String INGREDIENT_EXISTS = "Bahan sudah ada";
     }
 }

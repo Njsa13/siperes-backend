@@ -5,11 +5,13 @@ import com.siperes.siperes.dto.response.RecipeHistoryDetailResponse;
 import com.siperes.siperes.dto.response.RecipeHistoryListResponse;
 import com.siperes.siperes.dto.response.RecipeResponse;
 import com.siperes.siperes.dto.response.base.APIResultResponse;
+import com.siperes.siperes.enumeration.EnumSortBy;
 import com.siperes.siperes.service.RecipeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -57,7 +59,7 @@ public class BrowseRecipeController {
     @Schema(name = "GetAllRecipeHistoryRequest", description = "Get ALl Recipe History request body")
     @Operation(summary = "Endpoint untuk mengambil daftar history resep")
     public ResponseEntity<APIResultResponse<RecipeHistoryListResponse>> getAllRecipeHistory(@PathVariable String recipeSlug,
-                                                                                              @RequestParam("page") Integer page) {
+                                                                                            @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
         RecipeHistoryListResponse responses = recipeService.getRecipeHistories(recipeSlug, pageable);
         APIResultResponse<RecipeHistoryListResponse> resultResponse = new APIResultResponse<>(
@@ -75,6 +77,21 @@ public class BrowseRecipeController {
         APIResultResponse<RecipeHistoryDetailResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Behasil memuat detail riwayat resep",
+                responses);
+        return new ResponseEntity<>(resultResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    @Schema(name = "SearchRecipesRequest", description = "Search Recipes request body")
+    @Operation(summary = "Endpoint untuk mencari resep dengan memasukan nama resep atau bahan dan mengurutkannya sesuai kriteria")
+    public ResponseEntity<APIResultResponse<Page<RecipeResponse>>> searchOrSortRecipes(@RequestParam(value = "keyword", required = false) String keyword,
+                                                                                       @RequestParam(value = "sortBy", required = false) EnumSortBy sortBy,
+                                                                                       @RequestParam("page") Integer page) {
+        Pageable pageable = PageRequest.of(page, 8);
+        Page<RecipeResponse> responses = recipeService.searchAndSortingRecipe(keyword, sortBy, pageable);
+        APIResultResponse<Page<RecipeResponse>> resultResponse = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Behasil memuat daftar resep",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }

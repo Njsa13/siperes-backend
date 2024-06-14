@@ -24,6 +24,9 @@ public class Ingredient {
     @Column(name = "ingredient_id")
     private UUID id;
 
+    @Column(name = "ingredient_slug", nullable = false, unique = true)
+    private String ingredientSlug;
+
     @Column(name = "ingredient_name", nullable = false, unique = true)
     private String ingredientName;
 

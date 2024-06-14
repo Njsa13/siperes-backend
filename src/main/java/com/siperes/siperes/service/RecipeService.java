@@ -4,6 +4,7 @@ import com.siperes.siperes.dto.request.CreateRecipeRequest;
 import com.siperes.siperes.dto.request.SetRecipeRequest;
 import com.siperes.siperes.dto.request.UpdateRecipeRequest;
 import com.siperes.siperes.dto.response.*;
+import com.siperes.siperes.enumeration.EnumSortBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,4 +28,5 @@ public interface RecipeService {
     RecipeDetailResponse getRecipeDetail(String recipeSlug);
     RecipeHistoryListResponse getRecipeHistories(String recipeSlug, Pageable pageable);
     RecipeHistoryDetailResponse getRecipeHistoryDetail(String historySlug);
+    Page<RecipeResponse> searchAndSortingRecipe(String keyword, EnumSortBy sortBy, Pageable pageable);
 }

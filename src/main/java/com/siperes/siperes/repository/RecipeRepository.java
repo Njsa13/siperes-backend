@@ -7,6 +7,7 @@ import com.siperes.siperes.model.Recipe;
 import com.siperes.siperes.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +22,5 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
     Page<Recipe> findByBookmarksAndStatusAndVisibility(User bookmarks, EnumStatus status, EnumVisibility visibility, Pageable pageable);
     Optional<Recipe> findFirstByRecipeSlugAndStatusAndVisibility(String recipeSlug, EnumStatus status, EnumVisibility visibility);
     List<Recipe> findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus status, EnumVisibility visibility, EnumRecipeType recipeType);
+    Page<Recipe> findAll(Specification<Recipe> specification, Pageable pageable);
 }
