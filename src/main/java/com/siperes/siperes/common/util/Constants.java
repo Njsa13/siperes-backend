@@ -36,6 +36,7 @@ public class Constants {
     }
 
     public static final class ErrorMessage {
+        public static final String USER_NOT_FOUND = "User tidak ditemukan";
         public static final String USERNAME_NOT_FOUND = "Username tidak ditamukan";
         public static final String EMAIL_NOT_FOUND = "Email tidak ditamukan";
         public static final String WRONG_PASSWORD = "Password salah";
