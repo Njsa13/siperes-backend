@@ -116,7 +116,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public RefreshTokenResponse refreshToken() {
         try {
             String refreshToken = jwtUtil.getTokenFromRequest();
-            String username = jwtUtil.extractUsername(refreshToken);
+            String username = jwtUtil.extractEmail(refreshToken);
             User user = userRepository.findFirstByUsername(username)
                     .orElseThrow(() -> new DataNotFoundException(USERNAME_NOT_FOUND));
             if (jwtUtil.isTokenValid(refreshToken, user)) {

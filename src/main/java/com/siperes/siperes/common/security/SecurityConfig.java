@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.siperes.siperes.common.util.Constants.CommonPats.SECURE_LIST_PATS;
+import static com.siperes.siperes.common.util.Constants.ManageIngredient.MANAGE_INGREDIENT_PATS_ALL;
 import static com.siperes.siperes.common.util.Constants.ManageRecipe.MANAGE_RECIPE_PATS_ALL;
 import static com.siperes.siperes.enumeration.EnumPermission.*;
 import static org.springframework.http.HttpMethod.*;
@@ -36,6 +37,10 @@ public class SecurityConfig {
                         .requestMatchers(POST, MANAGE_RECIPE_PATS_ALL).hasAnyAuthority(USER_CREATE.getPermission())
                         .requestMatchers(PUT, MANAGE_RECIPE_PATS_ALL).hasAnyAuthority(USER_UPDATE.getPermission())
                         .requestMatchers(DELETE, MANAGE_RECIPE_PATS_ALL).hasAnyAuthority(USER_DELETE.getPermission())
+                        .requestMatchers(GET, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_READ.getPermission())
+                        .requestMatchers(POST, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
+                        .requestMatchers(PUT, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                        .requestMatchers(DELETE, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_DELETE.getPermission())
                         .requestMatchers(SECURE_LIST_PATS)
                         .authenticated()
                         .anyRequest()

@@ -12,14 +12,26 @@ public class Constants {
         public static final String BROWSE_RECIPE_PATS = BASE_URL + "/browse-recipe";
     }
 
+    public static final class ManageUserProfile {
+        public static final String MANAGE_USER_PROFILE_PATS = BASE_URL + "/me";
+        public static final String MANAGE_USER_PROFILE_PATS_ALL = MANAGE_USER_PROFILE_PATS + "/**";
+    }
+
     public static final class ManageRecipe {
         public static final String MANAGE_RECIPE_PATS = BASE_URL + "/recipe";
         public static final String MANAGE_RECIPE_PATS_ALL = MANAGE_RECIPE_PATS + "/**";
     }
 
+    public static final class ManageIngredient {
+        public static final String MANAGE_INGREDIENT_PATS = BASE_URL + "/ingredient";
+        public static final String MANAGE_INGREDIENT_PATS_ALL = MANAGE_INGREDIENT_PATS + "/**";
+    }
+
     public static final class CommonPats {
             public static final String[] SECURE_LIST_PATS = {
-                    ManageRecipe.MANAGE_RECIPE_PATS_ALL
+                    ManageRecipe.MANAGE_RECIPE_PATS_ALL,
+                    ManageIngredient.MANAGE_INGREDIENT_PATS_ALL,
+                    ManageUserProfile.MANAGE_USER_PROFILE_PATS_ALL
             };
     }
 
@@ -71,9 +83,14 @@ public class Constants {
         public static final String INGREDIENT_DETAIL_NOT_FOUND = "Tidak ditemukan bahan dengan slug: ";
         public static final String STEP_NOT_FOUND = "Tidak ditemukan langkah dengan slug: ";
         public static final String INGREDIENT_NOT_FOUND = "Bahan tidak ditemukan";
+        public static final String IMAGE_PROFILE_NOT_FOUND = "Foto profile tidak ditemukan";
         public static final String INPUT_CANNOT_NULL = "Input tidak boleh null atau empty";
         public static final String FAILED_CHECK_FIELD_EXISTS= "Gagal memeriksa keberadaan field";
         public static final String FILED_GET_TWO_WORDS = "Gagal mengambil 2 huruf pertama";
+        public static final String FAILED_GET_USER_DETAIL = "Gagal memuat data user";
+        public static final String FAILED_UPDATE_USER_DETAIL = "Gagal memperbarui data user";
+        public static final String FAILED_UPDATE_PROFILE_IMAGE = "Gagal memperbarui foto profile";
+        public static final String FAILED_DELETE_PROFILE_IMAGE = "Gagal menghapus foto profile";
         public static final String INVALID_SLUG = "Slug tidak valid";
         public static final String FORBIDDEN_BOOKMARK = "Tidak dapat melakukan bookmark pada resep milik sendiri";
     }

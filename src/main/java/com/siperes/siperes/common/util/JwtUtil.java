@@ -59,7 +59,7 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         try {
             return extractClaim(token, Claims::getSubject);
         } catch (MalformedJwtException | SignatureException e) {
@@ -99,7 +99,7 @@ public class JwtUtil {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return extractEmail(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     public String getTokenFromRequest() {
@@ -113,8 +113,8 @@ public class JwtUtil {
 
     public User getUser() {
         String token = getTokenFromRequest();
-        String username = extractUsername(token);
-        return userRepository.findFirstByUsername(username)
+        String username = extractEmail(token);
+        return userRepository.findFirstByEmail(username)
                 .orElseThrow(() -> new DataNotFoundException(USERNAME_NOT_FOUND));
     }
 }

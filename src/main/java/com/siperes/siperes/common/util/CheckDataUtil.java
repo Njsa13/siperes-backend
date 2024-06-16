@@ -31,6 +31,7 @@ public class CheckDataUtil {
             throw e;
         }
         catch (Exception e) {
+            log.error(e.getMessage());
             throw new ServiceBusinessException("Failed to check field exists");
         }
     }

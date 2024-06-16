@@ -462,7 +462,7 @@ public class RecipeServiceImpl implements RecipeService {
                         recipeHistoryRepository.deleteByRecipeId(recipe.getId());
                         recipeRepository.delete(recipe);
                         Optional.ofNullable(recipe.getThumbnailImageLink())
-                                .ifPresent(image -> imageUtil.deleteImage(recipe.getThumbnailImageLink()));
+                                .ifPresent(imageUtil::deleteImage);
                     }, () -> {
                         throw new DataNotFoundException(RECIPE_NOT_FOUND);
                     });

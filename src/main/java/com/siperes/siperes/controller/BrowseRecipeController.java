@@ -1,11 +1,9 @@
 package com.siperes.siperes.controller;
 
-import com.siperes.siperes.dto.response.RecipeDetailResponse;
-import com.siperes.siperes.dto.response.RecipeHistoryDetailResponse;
-import com.siperes.siperes.dto.response.RecipeHistoryListResponse;
-import com.siperes.siperes.dto.response.RecipeResponse;
+import com.siperes.siperes.dto.response.*;
 import com.siperes.siperes.dto.response.base.APIResultResponse;
 import com.siperes.siperes.enumeration.EnumSortBy;
+import com.siperes.siperes.service.IngredientService;
 import com.siperes.siperes.service.RecipeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +26,7 @@ import static com.siperes.siperes.common.util.Constants.BrowseRecipe.BROWSE_RECI
 @Tag(name = "Browse Recipe", description = "Browse Recipe API")
 public class BrowseRecipeController {
     private final RecipeService recipeService;
+    private final IngredientService ingredientService;
 
     @GetMapping
     @Schema(name = "GetRecipeListRequest", description = "Get Recipe List request body")
@@ -92,6 +91,32 @@ public class BrowseRecipeController {
         APIResultResponse<Page<RecipeResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
                 "Behasil memuat daftar resep",
+                responses);
+        return new ResponseEntity<>(resultResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/ingredient")
+    @Schema(name = "GetIngredientListRequest", description = "Get Ingredient List request body")
+    @Operation(summary = "Endpoint untuk menampilkan daftar bahan pada homepage")
+    public ResponseEntity<APIResultResponse<List<IngredientResponse>>> getIngredientList() {
+        List<IngredientResponse> responses = ingredientService.getIngredientList();
+        APIResultResponse<List<IngredientResponse>> resultResponse = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Behasil memuat daftar bahan",
+                responses);
+        return new ResponseEntity<>(resultResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/search-ingredient")
+    @Schema(name = "GetAllIngredientRequest", description = "Get All Ingredient request body")
+    @Operation(summary = "Endpoint untuk menampilkan dan mencari bahan-bahan")
+    public ResponseEntity<APIResultResponse<Page<IngredientResponse>>> getAllIngredient(@RequestParam(value = "keyword", required = false) String keyword,
+                                                                                        @RequestParam("page") Integer page) {
+        Pageable pageable = PageRequest.of(page, 8);
+        Page<IngredientResponse> responses = ingredientService.getAllIngredient(keyword, pageable);
+        APIResultResponse<Page<IngredientResponse>> resultResponse = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Behasil memuat daftar bahan",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
