@@ -1,7 +1,7 @@
 package com.siperes.siperes.service;
 
 import com.siperes.siperes.common.util.MailUtil;
-import com.siperes.siperes.dto.request.ResendEmailVerificationRequest;
+import com.siperes.siperes.dto.request.ResetPasswordRequest;
 import com.siperes.siperes.enumeration.EnumEmailVerificationType;
 import com.siperes.siperes.exception.DataNotFoundException;
 import com.siperes.siperes.exception.ForbiddenException;
@@ -10,8 +10,10 @@ import com.siperes.siperes.model.EmailVerification;
 import com.siperes.siperes.model.User;
 import com.siperes.siperes.repository.EmailVerificationRepository;
 import com.siperes.siperes.repository.UserRepository;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final UserRepository userRepository;
     private final EmailVerificationRepository emailVerificationRepository;
     private final MailUtil mailUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -109,8 +112,35 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             log.info(e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.info("Verify Email Failed: {}", e.getMessage());
+            log.error("Verify Email Failed: {}", e.getMessage());
             throw new ServiceBusinessException(VERIFY_EMAIL_FAILED);
+        }
+    }
+
+    @Override
+    public void verifyEmailTokenForgotPassword(ResetPasswordRequest request) {
+        try {
+            emailVerificationRepository.findFirstByTokenAndEmailVerificationType(request.getToken(), EnumEmailVerificationType.FORGOT_PASSWORD).ifPresentOrElse(emailVerification -> {
+                if (emailVerification.getExpTime().isBefore(LocalDateTime.now())) {
+                    throw new ForbiddenException(TOKEN_EXPIRED);
+                }
+                if (!request.getPassword().equals(request.getConfirmPassword())) {
+                    throw new ValidationException(INVALID_CONFIRM_PASSWORD);
+                }
+                User user = emailVerification.getUser();
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+                userRepository.save(user);
+                emailVerification.setUser(null);
+                emailVerificationRepository.delete(emailVerification);
+            }, () -> {
+                throw new DataNotFoundException(TOKEN_NOT_FOUND);
+            });
+        } catch (DataNotFoundException | ForbiddenException | ValidationException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_RESET_PASSWORD);
         }
     }
 

@@ -1,9 +1,6 @@
 package com.siperes.siperes.controller;
 
-import com.siperes.siperes.dto.request.LoginRequest;
-import com.siperes.siperes.dto.request.RegisterRequest;
-import com.siperes.siperes.dto.request.ResendEmailVerificationRequest;
-import com.siperes.siperes.dto.request.SendEmailVerificationRequest;
+import com.siperes.siperes.dto.request.*;
 import com.siperes.siperes.dto.response.LoginResponse;
 import com.siperes.siperes.dto.response.RefreshTokenResponse;
 import com.siperes.siperes.dto.response.RegisterResponse;
@@ -121,5 +118,29 @@ public class AuthenticationController {
                 "Logout berhasil"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/send-email-forgot-password")
+    @Schema(name = "ForgotPasswordEmailRequest", description = "Forgot password email request body")
+    @Operation(summary = "Endpoint untuk lupa password")
+    public ResponseEntity<APIResponse> forgotPasswordEmail(@RequestBody @Valid ForgotPasswordRequest request) {
+        emailVerificationService.sendEmail(request.getEmail(), EnumEmailVerificationType.FORGOT_PASSWORD);
+        APIResponse response = new APIResponse(
+                HttpStatus.OK,
+                "Email ganti password berhasil dikirim"
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/email-verify-forgot-password")
+    @Schema(name = "VerifyForgotPasswordEmailRequest", description = "Verify forgot password email request body")
+    @Operation(summary = "Endpoint untuk verifikasi ganti password ketika lupa password")
+    public ResponseEntity<APIResponse> verifyForgotPasswordEmail(@RequestBody @Valid ResetPasswordRequest request) {
+        emailVerificationService.verifyEmailTokenForgotPassword(request);
+        APIResponse response = new APIResponse(
+                HttpStatus.OK,
+                "Password berhasil direset"
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

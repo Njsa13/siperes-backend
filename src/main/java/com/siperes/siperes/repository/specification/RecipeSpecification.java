@@ -1,5 +1,8 @@
 package com.siperes.siperes.repository.specification;
 
+import com.siperes.siperes.enumeration.EnumRecipeType;
+import com.siperes.siperes.enumeration.EnumStatus;
+import com.siperes.siperes.enumeration.EnumVisibility;
 import com.siperes.siperes.model.IngredientDetail;
 import com.siperes.siperes.model.Recipe;
 import jakarta.persistence.criteria.Join;
@@ -11,13 +14,26 @@ public class RecipeSpecification {
     public static Specification<Recipe> hasRecipeNameOrIngredientName(String keyword) {
         return (root, query, criteriaBuilder) -> {
             query.distinct(true);
-            if (keyword == null || keyword.isEmpty()) {
-                return criteriaBuilder.conjunction();
+
+            Predicate recipeNamePredicate = criteriaBuilder.conjunction();
+            Predicate ingredientNamePredicate = criteriaBuilder.conjunction();
+
+            if (keyword != null && !keyword.isEmpty()) {
+                Join<Recipe, IngredientDetail> ingredientDetailJoin = root.join("ingredientDetails", JoinType.LEFT);
+                recipeNamePredicate = criteriaBuilder.like(root.get("recipeName"), "%" + keyword.toLowerCase() + "%");
+                ingredientNamePredicate = criteriaBuilder.like(ingredientDetailJoin.get("ingredientName"), "%" + keyword.toLowerCase() + "%");
             }
-            Join<Recipe, IngredientDetail> ingredientDetailJoin = root.join("ingredientDetails", JoinType.LEFT);
-            Predicate recipeNamePredicate = criteriaBuilder.like(root.get("recipeName"), "%" + keyword + "%");
-            Predicate ingredientNamePredicate = criteriaBuilder.like(ingredientDetailJoin.get("ingredientName"), "%" + keyword + "%");
-            return criteriaBuilder.or(recipeNamePredicate, ingredientNamePredicate);
+
+            Predicate statusPredicate = criteriaBuilder.equal(root.get("status"), EnumStatus.ACTIVE);
+            Predicate visibilityPredicate = criteriaBuilder.equal(root.get("visibility"), EnumVisibility.PUBLIC);
+            Predicate typePredicate = criteriaBuilder.equal(root.get("recipeType"), EnumRecipeType.ORIGINAL);
+
+            return criteriaBuilder.and(
+                    criteriaBuilder.or(recipeNamePredicate, ingredientNamePredicate),
+                    statusPredicate,
+                    visibilityPredicate,
+                    typePredicate
+            );
         };
     }
 

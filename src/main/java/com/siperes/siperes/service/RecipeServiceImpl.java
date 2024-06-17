@@ -691,6 +691,11 @@ public class RecipeServiceImpl implements RecipeService {
             List<Recipe> recipes = Optional.ofNullable(recipeRepository.findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, EnumRecipeType.ORIGINAL))
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
             Boolean isLogin = checkLogin();
+            User user = null;
+            if (checkLogin()) {
+                user = jwtUtil.getUser();
+            }
+            User finalUser = user;
             return recipes.stream()
                     .map(recipe -> RecipeResponse.builder()
                             .recipeSlug(recipe.getRecipeSlug())
@@ -698,7 +703,9 @@ public class RecipeServiceImpl implements RecipeService {
                             .thumbnailImageLink(recipe.getThumbnailImageLink())
                             .totalRating(recipe.getTotalRating())
                             .createdAt(recipe.getCreatedAt().toLocalDate())
-                            .canBookmark(isLogin)
+                            .canBookmark(Optional.ofNullable(finalUser)
+                                    .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                                    .orElse(isLogin))
                             .build())
                     .collect(Collectors.toList());
         } catch (DataNotFoundException e) {
@@ -723,6 +730,11 @@ public class RecipeServiceImpl implements RecipeService {
                 }
             }
             Boolean isLogin = checkLogin();
+            User user = null;
+            if (checkLogin()) {
+                user = jwtUtil.getUser();
+            }
+            User finalUser = user;
             return RecipeDetailResponse.builder()
                     .recipeSlug(recipe.getRecipeSlug())
                     .recipeName(recipe.getRecipeName())
@@ -734,8 +746,12 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeType(recipe.getRecipeType())
                     .copyFromSlug(copyFromSlug)
                     .createdAt(recipe.getCreatedAt().toLocalDate())
-                    .canBookmark(isLogin)
-                    .canCopy(isLogin)
+                    .canBookmark(Optional.ofNullable(finalUser)
+                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .orElse(isLogin))
+                    .canCopy(Optional.ofNullable(finalUser)
+                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .orElse(isLogin))
                     .ingredientDetailResponses(recipe.getIngredientDetails().stream()
                             .map(ingredientDetail -> IngredientDetailResponse.builder()
                                     .ingredientDetailSlug(ingredientDetail.getIngredientDetailSlug())
@@ -840,13 +856,20 @@ public class RecipeServiceImpl implements RecipeService {
                     .filter(Page::hasContent)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
             Boolean isLogin = checkLogin();
+            User user = null;
+            if (checkLogin()) {
+                user = jwtUtil.getUser();
+            }
+            User finalUser = user;
             return recipePage.map(recipe -> RecipeResponse.builder()
                     .recipeSlug(recipe.getRecipeSlug())
                     .recipeName(recipe.getRecipeName())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
                     .totalRating(recipe.getTotalRating())
                     .createdAt(recipe.getCreatedAt().toLocalDate())
-                    .canBookmark(isLogin)
+                    .canBookmark(Optional.ofNullable(finalUser)
+                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .orElse(isLogin))
                     .build());
         } catch (DataNotFoundException e) {
             log.info(e.getMessage());

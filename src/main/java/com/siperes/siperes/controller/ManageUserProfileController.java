@@ -1,5 +1,6 @@
 package com.siperes.siperes.controller;
 
+import com.siperes.siperes.dto.request.ChangePasswordRequest;
 import com.siperes.siperes.dto.request.UpdateProfileImageRequest;
 import com.siperes.siperes.dto.request.UpdateUserDetailRequest;
 import com.siperes.siperes.dto.response.UpdateProfileImageResponse;
@@ -74,5 +75,17 @@ public class ManageUserProfileController {
                 "Berhasil menghapus foto profile"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PutMapping("/change-password")
+    @Schema(name = "ChangePasswordRequest", description = "Change password request body")
+    @Operation(summary = "Endpoint untuk mengganti password")
+    public ResponseEntity<APIResponse> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+        userService.changePassword(request);
+        APIResponse response = new APIResponse(
+                HttpStatus.OK,
+                "Password berhasil diperbarui"
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

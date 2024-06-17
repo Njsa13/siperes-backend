@@ -92,6 +92,10 @@ public class Constants {
         public static final String FAILED_UPDATE_USER_DETAIL = "Gagal memperbarui data user";
         public static final String FAILED_UPDATE_PROFILE_IMAGE = "Gagal memperbarui foto profile";
         public static final String FAILED_DELETE_PROFILE_IMAGE = "Gagal menghapus foto profile";
+        public static final String INVALID_CURRENT_PASSWORD = "Password sekarang salah";
+        public static final String INVALID_CONFIRM_PASSWORD = "Password baru dan konfirmasi password tidak cocok";
+        public static final String FAILED_CHANGE_PASSWORD = "Gagal mengganti password";
+        public static final String FAILED_RESET_PASSWORD = "Gagal mereset password";
         public static final String INVALID_SLUG = "Slug tidak valid";
         public static final String FORBIDDEN_BOOKMARK = "Tidak dapat melakukan bookmark pada resep milik sendiri";
     }

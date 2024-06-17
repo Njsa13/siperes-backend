@@ -3,6 +3,7 @@ package com.siperes.siperes.service;
 import com.siperes.siperes.common.util.CheckDataUtil;
 import com.siperes.siperes.common.util.ImageUtil;
 import com.siperes.siperes.common.util.JwtUtil;
+import com.siperes.siperes.dto.request.ChangePasswordRequest;
 import com.siperes.siperes.dto.request.UpdateProfileImageRequest;
 import com.siperes.siperes.dto.request.UpdateUserDetailRequest;
 import com.siperes.siperes.dto.response.UpdateProfileImageResponse;
@@ -13,8 +14,10 @@ import com.siperes.siperes.exception.DataNotFoundException;
 import com.siperes.siperes.exception.ServiceBusinessException;
 import com.siperes.siperes.model.User;
 import com.siperes.siperes.repository.UserRepository;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService{
     private final JwtUtil jwtUtil;
     private final CheckDataUtil checkDataUtil;
     private final ImageUtil imageUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -107,6 +111,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void deleteProfileImage() {
         try {
             User user = jwtUtil.getUser();
@@ -124,6 +129,28 @@ public class UserServiceImpl implements UserService{
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ServiceBusinessException(FAILED_DELETE_PROFILE_IMAGE);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        try {
+            User user = jwtUtil.getUser();
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new ValidationException(INVALID_CURRENT_PASSWORD);
+            }
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                throw new ValidationException(INVALID_CONFIRM_PASSWORD);
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+        } catch (ValidationException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_CHANGE_PASSWORD);
         }
     }
 }

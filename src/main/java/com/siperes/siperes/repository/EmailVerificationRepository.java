@@ -14,4 +14,5 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
     Optional<EmailVerification> findFirstByUserAndEmailVerificationTypeOrderByExpTimeDesc(User user, EnumEmailVerificationType emailVerificationType);
     Optional<EmailVerification> findFirstByToken(String token);
     Boolean existsByToken(String token);
+    Optional<EmailVerification> findFirstByTokenAndEmailVerificationType(String token, EnumEmailVerificationType type);
 }
