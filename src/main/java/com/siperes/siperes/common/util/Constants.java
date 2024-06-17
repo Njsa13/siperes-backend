@@ -64,6 +64,8 @@ public class Constants {
         public static final String FAILED_ADD_RECIPE = "Gagal membuat resep baru";
         public static final String FAILED_UPDATE_RECIPE = "Gagal memperbarui resep";
         public static final String FAILED_DELETE_RECIPE = "Gagal menghapus resep";
+        public static final String FAILED_GET_UPDATE_RECIPE_DETAIL = "Gagal memuat detail update resep";
+        public static final String FAILED_GET_SETTING_RECIPE_DETAIL = "Gagal memuat detail pengaturan resep";
         public static final String FAILED_SET_RECIPE = "Gagal mengubah pengaturan resep";
         public static final String FAILED_GET_ALL_MY_RECIPE = "Gagal memuat semua resep saya";
         public static final String FAILED_GET_MY_RECIPE_DETAIL = "Gagal memuat detail resep saya";
@@ -96,8 +98,13 @@ public class Constants {
         public static final String INVALID_CONFIRM_PASSWORD = "Password baru dan konfirmasi password tidak cocok";
         public static final String FAILED_CHANGE_PASSWORD = "Gagal mengganti password";
         public static final String FAILED_RESET_PASSWORD = "Gagal mereset password";
+        public static final String FAILED_DOWNLOAD_IMG = "Gagal Mengunduh gambar";
+        public static final String FAILED_COPY_RECIPE = "Gagal menyalin resep";
         public static final String INVALID_SLUG = "Slug tidak valid";
+        public static final String MAX_COPY_RECIPE = "Tidak bisa menyalin resep melebihi 3";
         public static final String FORBIDDEN_BOOKMARK = "Tidak dapat melakukan bookmark pada resep milik sendiri";
+        public static final String FORBIDDEN_COPY = "Tidak dapat menyalin resep milik sendiri";
+        public static final String FORBIDDEN_ACCESS_PRIVATE = "Anda tidak bisa mengakses resep private";
     }
 
     public static final class EmailMessage {

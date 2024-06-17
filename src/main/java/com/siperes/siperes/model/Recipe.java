@@ -4,10 +4,7 @@ import com.siperes.siperes.enumeration.EnumRecipeType;
 import com.siperes.siperes.enumeration.EnumStatus;
 import com.siperes.siperes.enumeration.EnumVisibility;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +14,7 @@ import java.util.UUID;
 
 @Data
 @Builder
+@EqualsAndHashCode(of = "recipeSlug")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -75,10 +73,10 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Set<RecipeReview> recipeReviews;
 
-    @OneToMany(mappedBy = "originalRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "originalRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<CopyDetail> originalRecipeCopyDetails;
 
-    @OneToMany(mappedBy = "copyRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "copyRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<CopyDetail> copyRecipeCopyDetails;
 
     @ManyToOne

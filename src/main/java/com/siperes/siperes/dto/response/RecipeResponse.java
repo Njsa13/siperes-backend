@@ -1,6 +1,7 @@
 package com.siperes.siperes.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.siperes.siperes.enumeration.EnumRecipeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,5 @@ public class RecipeResponse {
     private LocalDate createdAt;
     private Boolean canBookmark;
     private Boolean isBookmarked;
+    private EnumRecipeType recipeType;
 }

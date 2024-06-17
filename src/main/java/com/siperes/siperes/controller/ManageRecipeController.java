@@ -194,4 +194,17 @@ public class ManageRecipeController {
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
+
+    @PostMapping("/copy-recipe/{recipeSlug}")
+    @Schema(name = "CopyRecipeRequest", description = "Copy Recipe request body")
+    @Operation(summary = "Endpoint untuk membuat menyalin resep")
+    public ResponseEntity<APIResultResponse<CreateRecipeResponse>> copyRecipe(@PathVariable String recipeSlug) {
+        CreateRecipeResponse response = recipeService.copyRecipe(recipeSlug);
+        APIResultResponse<CreateRecipeResponse> resultResponse = new APIResultResponse<>(
+                HttpStatus.CREATED,
+                "Berhasil menyalin resep",
+                response
+        );
+        return new ResponseEntity<>(resultResponse, HttpStatus.CREATED);
+    }
 }

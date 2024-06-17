@@ -1,6 +1,7 @@
 package com.siperes.siperes.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.siperes.siperes.enumeration.EnumRecipeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class MyRecipeResponse {
     private String thumbnailImageLink;
 
     private Double totalRating;
+
+    private EnumRecipeType recipeType;
 
     private LocalDate createdAt;
 }

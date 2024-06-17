@@ -20,6 +20,7 @@ import com.siperes.siperes.model.*;
 import com.siperes.siperes.model.json.IngredientDetailJson;
 import com.siperes.siperes.model.json.RecipeDetailJson;
 import com.siperes.siperes.model.json.StepJson;
+import com.siperes.siperes.model.key.CopyDetailKey;
 import com.siperes.siperes.repository.*;
 import com.siperes.siperes.repository.specification.RecipeSpecification;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final StepRepository stepRepository;
     private final RecipeHistoryRepository recipeHistoryRepository;
     private final UserRepository userRepository;
+    private final CopyDetailRepository copyDetailRepository;
 
     @Transactional
     @Override
@@ -425,7 +427,7 @@ public class RecipeServiceImpl implements RecipeService {
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(FAILED_SET_RECIPE);
+            throw new ServiceBusinessException(FAILED_GET_UPDATE_RECIPE_DETAIL);
         }
     }
 
@@ -448,7 +450,7 @@ public class RecipeServiceImpl implements RecipeService {
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(FAILED_SET_RECIPE);
+            throw new ServiceBusinessException(FAILED_GET_SETTING_RECIPE_DETAIL);
         }
     }
 
@@ -459,6 +461,12 @@ public class RecipeServiceImpl implements RecipeService {
             User user = jwtUtil.getUser();
             recipeRepository.findFirstByRecipeSlugAndUserAndStatus(recipeSlug, user, EnumStatus.ACTIVE)
                     .ifPresentOrElse(recipe -> {
+                        if (!recipe.getCopyRecipeCopyDetails().isEmpty()) {
+                            copyDetailRepository.deleteByCopyRecipeId(recipe.getId());
+                        }
+                        if (!recipe.getOriginalRecipeCopyDetails().isEmpty()) {
+                            recipe.getOriginalRecipeCopyDetails().clear();
+                        }
                         recipeHistoryRepository.deleteByRecipeId(recipe.getId());
                         recipeRepository.delete(recipe);
                         Optional.ofNullable(recipe.getThumbnailImageLink())
@@ -488,6 +496,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
                     .totalRating(recipe.getTotalRating())
+                    .recipeType(recipe.getRecipeType())
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .build());
         } catch (DataNotFoundException e) {
@@ -574,6 +583,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .canBookmark(true)
                     .isBookmarked(recipe.getBookmarks().contains(user))
+                    .recipeType(recipe.getRecipeType())
                     .build());
         } catch (DataNotFoundException e) {
             log.info(e.getMessage());
@@ -645,8 +655,11 @@ public class RecipeServiceImpl implements RecipeService {
     public void createBookmark(String recipeSlug) {
         try {
             User user = jwtUtil.getUser();
-            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatusAndVisibility(recipeSlug, EnumStatus.ACTIVE, EnumVisibility.PUBLIC)
+            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatus(recipeSlug, EnumStatus.ACTIVE)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE)) {
+                throw new ForbiddenException(FORBIDDEN_ACCESS_PRIVATE);
+            }
             if (user.equals(recipe.getUser())) {
                 throw new ForbiddenException(FORBIDDEN_BOOKMARK);
             }
@@ -668,8 +681,11 @@ public class RecipeServiceImpl implements RecipeService {
     public void deleteBookmark(String recipeSlug) {
         try {
             User user = jwtUtil.getUser();
-            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatusAndVisibility(recipeSlug, EnumStatus.ACTIVE, EnumVisibility.PUBLIC)
+            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatus(recipeSlug, EnumStatus.ACTIVE)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE)) {
+                throw new ForbiddenException(FORBIDDEN_ACCESS_PRIVATE);
+            }
             if (user.equals(recipe.getUser())) {
                 throw new ForbiddenException(FORBIDDEN_BOOKMARK);
             }
@@ -687,6 +703,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<RecipeResponse> getRecipeList() {
         try {
             List<Recipe> recipes = Optional.ofNullable(recipeRepository.findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, EnumRecipeType.ORIGINAL))
@@ -722,10 +739,14 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RecipeDetailResponse getRecipeDetail(String recipeSlug) {
         try {
-            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatusAndVisibility(recipeSlug, EnumStatus.ACTIVE, EnumVisibility.PUBLIC)
+            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatus(recipeSlug, EnumStatus.ACTIVE)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE)) {
+                throw new ForbiddenException(FORBIDDEN_ACCESS_PRIVATE);
+            }
             String copyFromSlug = null;
             if (Objects.equals(recipe.getRecipeType(), EnumRecipeType.COPY)) {
                 Optional<CopyDetail> copyDetail = recipe.getCopyRecipeCopyDetails().stream().findFirst();
@@ -783,7 +804,7 @@ public class RecipeServiceImpl implements RecipeService {
                             .sorted(Comparator.comparingInt(StepDetailResponse::getNumberStep))
                             .collect(Collectors.toList()))
                     .build();
-        } catch (DataNotFoundException e) {
+        } catch (DataNotFoundException | ForbiddenException e) {
             log.info(e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -793,10 +814,14 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RecipeHistoryListResponse getRecipeHistories(String recipeSlug, Pageable pageable) {
         try {
-            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatusAndVisibility(recipeSlug, EnumStatus.ACTIVE, EnumVisibility.PUBLIC)
+            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatus(recipeSlug, EnumStatus.ACTIVE)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_NOT_FOUND));
+            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE)) {
+                throw new ForbiddenException(FORBIDDEN_ACCESS_PRIVATE);
+            }
             Page<RecipeHistory> recipeHistoryPage = Optional.of(recipeHistoryRepository.findByRecipe(recipe, pageable))
                     .filter(Page::hasContent)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_NOT_FOUND));
@@ -811,7 +836,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .historyDetailResponses(responsePage)
                     .build();
-        } catch (DataNotFoundException e) {
+        } catch (DataNotFoundException | ForbiddenException e) {
             log.info(e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -821,6 +846,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RecipeHistoryDetailResponse getRecipeHistoryDetail(String historySlug) {
         try {
             RecipeHistory recipeHistory = recipeHistoryRepository.findFirstByHistorySlug(historySlug)
@@ -845,6 +871,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<RecipeResponse> searchAndSortingRecipe(String keyword, EnumSortBy sortBy, Pageable pageable) {
         try {
             Specification<Recipe> specification = Specification.where(RecipeSpecification.hasRecipeNameOrIngredientName(keyword));
@@ -886,20 +913,131 @@ public class RecipeServiceImpl implements RecipeService {
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(FAILED_GET_RECIPE_HISTORY_DETAIL);
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_LIST);
         }
     }
 
     @Override
+    @Transactional
     public CreateRecipeResponse copyRecipe(String recipeSlug) {
         try {
-            return null;
-        } catch (DataNotFoundException e) {
+            Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatus(recipeSlug, EnumStatus.ACTIVE)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE)) {
+                throw new ForbiddenException(FORBIDDEN_ACCESS_PRIVATE);
+            }
+            User user = jwtUtil.getUser();
+            if (user.equals(recipe.getUser())) {
+                throw new ForbiddenException(FORBIDDEN_COPY);
+            }
+            if (recipeRepository.countCopyRecipe(user, recipe) >= 3) {
+                throw new ForbiddenException(MAX_COPY_RECIPE);
+            }
+            CompletableFuture<String> image = imageUtil.downloadImageAsBase64(recipe.getThumbnailImageLink());
+            CompletableFuture<String> futureRecipeSlug = slugUtil.toSlug("recipes", "recipe_slug", recipe.getRecipeName());
+            List<IngredientDetail> ingredientDetails = recipe.getIngredientDetails().stream().toList();
+            List<Step> steps = recipe.getSteps().stream()
+                    .sorted(Comparator.comparingInt(Step::getNumberStep))
+                    .toList();
+            List<CompletableFuture<String>> futureIngredientDetailSlugs = ingredientDetails.stream()
+                    .map(ingredientDetail -> slugUtil.toSlug(
+                            "ingredient_details",
+                            "ingredient_detail_slug",
+                            ingredientDetail.getIngredientName()))
+                    .toList();
+            List<CompletableFuture<String>> futureStepSlugs = steps.stream()
+                    .map(step -> slugUtil.toSlug(
+                            "steps",
+                            "step_slug",
+                            stringUtil.getFirstTwoWords(step.getStepDescription())))
+                    .toList();
+            String imageString = "data:image/jpeg;base64," + image.join();
+            CompletableFuture<String> thumbnailImageLink = imageUtil.base64UploadImage(imageString);
+            Recipe newRecipe = Recipe.builder()
+                    .recipeSlug(futureRecipeSlug.join())
+                    .recipeName(recipe.getRecipeName())
+                    .about(recipe.getAbout())
+                    .thumbnailImageLink(thumbnailImageLink.join())
+                    .portion(recipe.getPortion())
+                    .totalRating(0.0)
+                    .visibility(EnumVisibility.PUBLIC)
+                    .recipeType(EnumRecipeType.COPY)
+                    .status(EnumStatus.ACTIVE)
+                    .user(user)
+                    .build();
+            Recipe finalRecipe = recipeRepository.save(newRecipe);
+            CopyDetailKey key = CopyDetailKey.builder()
+                    .originalRecipeId(recipe.getId())
+                    .copyRecipeId(finalRecipe.getId())
+                    .build();
+            CopyDetail copyDetail = CopyDetail.builder()
+                    .id(key)
+                    .originalRecipe(recipe)
+                    .copyRecipe(finalRecipe)
+                    .build();
+            copyDetailRepository.save(copyDetail);
+            List<IngredientDetail> newIngredientDetails = IntStream.range(0, futureIngredientDetailSlugs.size())
+                    .mapToObj(i -> IngredientDetail.builder()
+                            .ingredientDetailSlug(futureIngredientDetailSlugs.get(i).join())
+                            .ingredientName(ingredientDetails.get(i).getIngredientName())
+                            .dose(ingredientDetails.get(i).getDose())
+                            .ingredient(getIngredientIfExists(ingredientDetails.get(i).getIngredientName().toLowerCase()))
+                            .recipe(finalRecipe)
+                            .build())
+                    .toList();
+            newIngredientDetails = ingredientDetailRepository.saveAll(newIngredientDetails);
+            List<Step> newSteps = IntStream.range(0, futureStepSlugs.size())
+                    .mapToObj(i -> Step.builder()
+                            .stepSlug(futureStepSlugs.get(i).join())
+                            .numberStep(i+1)
+                            .stepDescription(steps.get(i).getStepDescription())
+                            .recipe(finalRecipe)
+                            .build())
+                    .toList();
+            newSteps = stepRepository.saveAll(newSteps);
+            return CreateRecipeResponse.builder()
+                    .recipeSlug(finalRecipe.getRecipeSlug())
+                    .recipeName(finalRecipe.getRecipeName())
+                    .about(finalRecipe.getAbout())
+                    .thumbnailImageLink(finalRecipe.getThumbnailImageLink())
+                    .portion(finalRecipe.getPortion())
+                    .totalRating(finalRecipe.getTotalRating())
+                    .visibility(finalRecipe.getVisibility())
+                    .recipeType(finalRecipe.getRecipeType())
+                    .status(finalRecipe.getStatus())
+                    .createdAt(finalRecipe.getCreatedAt())
+                    .createIngredientDetailResponses(newIngredientDetails.stream()
+                            .map(ingredientDetail -> CreateIngredientDetailResponse.builder()
+                                    .ingredientDetailSlug(ingredientDetail.getIngredientDetailSlug())
+                                    .ingredientName(ingredientDetail.getIngredientName())
+                                    .dose(ingredientDetail.getDose())
+                                    .createdAt(ingredientDetail.getCreatedAt())
+                                    .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
+                                            .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientSlug(ingredient.getIngredientSlug())
+                                                    .ingredientName(ingredient.getIngredientName())
+                                                    .imageLink(ingredient.getImageLink())
+                                                    .build())
+                                            .orElse(null))
+                                    .build())
+                            .sorted(Comparator.comparing(CreateIngredientDetailResponse::getIngredientName))
+                            .collect(Collectors.toList()))
+                    .createStepResponses(newSteps.stream()
+                            .map(step -> CreateStepResponse.builder()
+                                    .stepSlug(step.getStepSlug())
+                                    .numberStep(step.getNumberStep())
+                                    .stepDescription(step.getStepDescription())
+                                    .createdAt(step.getCreatedAt())
+                                    .build())
+                            .sorted(Comparator.comparingInt(CreateStepResponse::getNumberStep))
+                            .collect(Collectors.toList()))
+                    .build();
+        } catch (DataNotFoundException | ForbiddenException e) {
             log.info(e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(FAILED_GET_RECIPE_HISTORY_DETAIL);
+            throw new ServiceBusinessException(FAILED_COPY_RECIPE);
         }
     }
 
