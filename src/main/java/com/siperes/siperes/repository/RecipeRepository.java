@@ -23,4 +23,5 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
     Optional<Recipe> findFirstByRecipeSlugAndStatusAndVisibility(String recipeSlug, EnumStatus status, EnumVisibility visibility);
     List<Recipe> findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus status, EnumVisibility visibility, EnumRecipeType recipeType);
     Page<Recipe> findAll(Specification<Recipe> specification, Pageable pageable);
+    Boolean existsByBookmarks(User bookmarks);
 }

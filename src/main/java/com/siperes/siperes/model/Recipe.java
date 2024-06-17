@@ -85,7 +85,7 @@ public class Recipe {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
 
-    @ManyToMany(mappedBy = "bookmarks")
+    @ManyToMany(mappedBy = "bookmarks", fetch = FetchType.EAGER)
     private Set<User> bookmarks;
 
     @PrePersist

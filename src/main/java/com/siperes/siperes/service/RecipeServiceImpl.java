@@ -573,6 +573,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .totalRating(recipe.getTotalRating())
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .canBookmark(true)
+                    .isBookmarked(recipe.getBookmarks().contains(user))
                     .build());
         } catch (DataNotFoundException e) {
             log.info(e.getMessage());
@@ -706,6 +707,9 @@ public class RecipeServiceImpl implements RecipeService {
                             .canBookmark(Optional.ofNullable(finalUser)
                                     .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
                                     .orElse(isLogin))
+                            .isBookmarked(Optional.ofNullable(finalUser)
+                                    .map(val -> recipe.getBookmarks().contains(val))
+                                    .orElse(null))
                             .build())
                     .collect(Collectors.toList());
         } catch (DataNotFoundException e) {
@@ -752,6 +756,9 @@ public class RecipeServiceImpl implements RecipeService {
                     .canCopy(Optional.ofNullable(finalUser)
                             .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
                             .orElse(isLogin))
+                    .isBookmarked(Optional.ofNullable(finalUser)
+                            .map(val -> recipe.getBookmarks().contains(val))
+                            .orElse(null))
                     .ingredientDetailResponses(recipe.getIngredientDetails().stream()
                             .map(ingredientDetail -> IngredientDetailResponse.builder()
                                     .ingredientDetailSlug(ingredientDetail.getIngredientDetailSlug())
@@ -870,7 +877,23 @@ public class RecipeServiceImpl implements RecipeService {
                     .canBookmark(Optional.ofNullable(finalUser)
                             .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
                             .orElse(isLogin))
+                    .isBookmarked(Optional.ofNullable(finalUser)
+                            .map(val -> recipe.getBookmarks().contains(val))
+                            .orElse(null))
                     .build());
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_HISTORY_DETAIL);
+        }
+    }
+
+    @Override
+    public CreateRecipeResponse copyRecipe(String recipeSlug) {
+        try {
+            return null;
         } catch (DataNotFoundException e) {
             log.info(e.getMessage());
             throw e;

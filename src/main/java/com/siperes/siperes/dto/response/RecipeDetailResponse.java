@@ -29,6 +29,7 @@ public class RecipeDetailResponse {
     private LocalDate createdAt;
     private Boolean canBookmark;
     private Boolean canCopy;
+    private Boolean isBookmarked;
     private List<IngredientDetailResponse> ingredientDetailResponses;
     private List<StepDetailResponse> stepDetailResponses;
 }

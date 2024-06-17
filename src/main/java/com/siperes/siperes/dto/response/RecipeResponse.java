@@ -20,4 +20,5 @@ public class RecipeResponse {
     private Double totalRating;
     private LocalDate createdAt;
     private Boolean canBookmark;
+    private Boolean isBookmarked;
 }

@@ -29,4 +29,5 @@ public interface RecipeService {
     RecipeHistoryListResponse getRecipeHistories(String recipeSlug, Pageable pageable);
     RecipeHistoryDetailResponse getRecipeHistoryDetail(String historySlug);
     Page<RecipeResponse> searchAndSortingRecipe(String keyword, EnumSortBy sortBy, Pageable pageable);
+    CreateRecipeResponse copyRecipe(String recipeSlug);
 }
