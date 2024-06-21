@@ -26,6 +26,7 @@ public interface RecipeService {
     void deleteBookmark(String recipeSlug);
     List<RecipeResponse> getRecipeList();
     RecipeDetailResponse getRecipeDetail(String recipeSlug);
+    Page<RecipeResponse> getCopyRecipeList(String recipeSlug, Pageable pageable);
     RecipeHistoryListResponse getRecipeHistories(String recipeSlug, Pageable pageable);
     RecipeHistoryDetailResponse getRecipeHistoryDetail(String historySlug);
     Page<RecipeResponse> searchAndSortingRecipe(String keyword, EnumSortBy sortBy, Pageable pageable);

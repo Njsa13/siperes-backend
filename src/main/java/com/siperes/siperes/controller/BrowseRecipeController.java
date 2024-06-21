@@ -54,6 +54,21 @@ public class BrowseRecipeController {
         return new ResponseEntity<>(resultResponse,HttpStatus.OK);
     }
 
+    @GetMapping("/copied/{recipeSlug}")
+    @Schema(name = "GetCopyRecipeListRequest", description = "Get Copy Recipe List request body")
+    @Operation(summary = "Endpoint untuk memuat daftar resep salinan dari sebuah resep original")
+    public ResponseEntity<APIResultResponse<Page<RecipeResponse>>> getCopyRecipeList(@PathVariable String recipeSlug,
+                                                                                     @RequestParam("page") Integer page) {
+        Pageable pageable = PageRequest.of(page, 8);
+        Page<RecipeResponse> responses = recipeService.getCopyRecipeList(recipeSlug, pageable);
+        APIResultResponse<Page<RecipeResponse>> resultResponse = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Berhasil memuat daftar resep salinan",
+                responses
+        );
+        return new ResponseEntity<>(resultResponse,HttpStatus.OK);
+    }
+
     @GetMapping("/get-all-recipe-history/{recipeSlug}")
     @Schema(name = "GetAllRecipeHistoryRequest", description = "Get ALl Recipe History request body")
     @Operation(summary = "Endpoint untuk mengambil daftar history resep")

@@ -2,10 +2,7 @@ package com.siperes.siperes.model;
 
 import com.siperes.siperes.enumeration.EnumRequestStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -13,6 +10,7 @@ import java.util.UUID;
 
 @Data
 @Builder
+@EqualsAndHashCode(exclude = "copyDetail")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -32,10 +30,7 @@ public class ModificationRequest {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumns({
-            @JoinColumn(name="original_recipe_id", referencedColumnName="original_recipe_id", nullable = false),
-            @JoinColumn(name="copy_recipe_id", referencedColumnName="copy_recipe_id", nullable = false)
-    })
+    @ManyToOne
+    @JoinColumn(name="copy_detail_id", referencedColumnName="copy_detail_id")
     private CopyDetail copyDetail;
 }

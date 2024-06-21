@@ -22,6 +22,11 @@ public class Constants {
         public static final String MANAGE_RECIPE_PATS_ALL = MANAGE_RECIPE_PATS + "/**";
     }
 
+    public static final class ModificationRequest {
+        public static final String MODIFICATION_REQUEST_PATS = BASE_URL + "/modification-request";
+        public static final String MODIFICATION_REQUEST_PATS_ALL = MODIFICATION_REQUEST_PATS + "/**";
+    }
+
     public static final class ManageIngredient {
         public static final String MANAGE_INGREDIENT_PATS = BASE_URL + "/ingredient";
         public static final String MANAGE_INGREDIENT_PATS_ALL = MANAGE_INGREDIENT_PATS + "/**";
@@ -31,7 +36,8 @@ public class Constants {
             public static final String[] SECURE_LIST_PATS = {
                     ManageRecipe.MANAGE_RECIPE_PATS_ALL,
                     ManageIngredient.MANAGE_INGREDIENT_PATS_ALL,
-                    ManageUserProfile.MANAGE_USER_PROFILE_PATS_ALL
+                    ManageUserProfile.MANAGE_USER_PROFILE_PATS_ALL,
+                    ModificationRequest.MODIFICATION_REQUEST_PATS_ALL
             };
     }
 
@@ -87,6 +93,8 @@ public class Constants {
         public static final String STEP_NOT_FOUND = "Tidak ditemukan langkah dengan slug: ";
         public static final String INGREDIENT_NOT_FOUND = "Bahan tidak ditemukan";
         public static final String IMAGE_PROFILE_NOT_FOUND = "Foto profile tidak ditemukan";
+        public static final String ORIGINAL_RECIPE_NOT_FOUND = "Resep salinan tidak ditemukan atau resep tidak memiliki resep asal (Merupakah resep original atau resep asal telah dihapus)";
+        public static final String MODIFICATION_REQUEST_NOT_FOUND = "penmintaan modifikasi tidak ditemukan";
         public static final String INPUT_CANNOT_NULL = "Input tidak boleh null atau empty";
         public static final String FAILED_CHECK_FIELD_EXISTS= "Gagal memeriksa keberadaan field";
         public static final String FILED_GET_TWO_WORDS = "Gagal mengambil 2 huruf pertama";
@@ -94,6 +102,11 @@ public class Constants {
         public static final String FAILED_UPDATE_USER_DETAIL = "Gagal memperbarui data user";
         public static final String FAILED_UPDATE_PROFILE_IMAGE = "Gagal memperbarui foto profile";
         public static final String FAILED_DELETE_PROFILE_IMAGE = "Gagal menghapus foto profile";
+        public static final String FAILED_CREATE_MODIFICATION_REQUEST = "Gagal membuat permintaan modifikasi";
+        public static final String FAILED_GET_MODIFICATION_REQUEST = "Gagal memuat permintaan modifikasi";
+        public static final String FAILED_GET_RECIPE_COPY = "Gagal memuat resep copy untuk permintaan modifikasi";
+        public static final String FAILED_TO_APPROVE_REQUEST = "Gagal menyetujui permintaan modifikasi";
+        public static final String FAILED_TO_REJECT_REQUEST = "Gagal menolak permintaan modifikasi";
         public static final String INVALID_CURRENT_PASSWORD = "Password sekarang salah";
         public static final String INVALID_CONFIRM_PASSWORD = "Password baru dan konfirmasi password tidak cocok";
         public static final String FAILED_CHANGE_PASSWORD = "Gagal mengganti password";
@@ -104,7 +117,11 @@ public class Constants {
         public static final String MAX_COPY_RECIPE = "Tidak bisa menyalin resep melebihi 3";
         public static final String FORBIDDEN_BOOKMARK = "Tidak dapat melakukan bookmark pada resep milik sendiri";
         public static final String FORBIDDEN_COPY = "Tidak dapat menyalin resep milik sendiri";
-        public static final String FORBIDDEN_ACCESS_PRIVATE = "Anda tidak bisa mengakses resep private";
+        public static final String FORBIDDEN_ACCESS_PRIVATE = "Tidak bisa mengakses resep private";
+        public static final String FORBIDDEN_APPROVE_REQUEST = "Tidak bisa menyetujui atau menolak permintaan modifikasi pada resep original";
+        public static final String FORBIDDEN_PRIVATE_REQUEST = "Resep tujuan sedang di private";
+        public static final String FORBIDDEN_EMPTY_HISTORIES = "Belum ada pembaruan pada resep salinan yang ingin anda ajukan";
+        public static final String EXISTS_REQUEST = "Sudah melakukan permintaan modifikasi sebelumnya dan masih berstatus menunggu";
     }
 
     public static final class EmailMessage {

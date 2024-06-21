@@ -9,10 +9,7 @@ import com.siperes.siperes.dto.request.SetRecipeRequest;
 import com.siperes.siperes.dto.request.UpdateIngredientDetailRequest;
 import com.siperes.siperes.dto.request.UpdateRecipeRequest;
 import com.siperes.siperes.dto.response.*;
-import com.siperes.siperes.enumeration.EnumRecipeType;
-import com.siperes.siperes.enumeration.EnumSortBy;
-import com.siperes.siperes.enumeration.EnumStatus;
-import com.siperes.siperes.enumeration.EnumVisibility;
+import com.siperes.siperes.enumeration.*;
 import com.siperes.siperes.exception.DataNotFoundException;
 import com.siperes.siperes.exception.ForbiddenException;
 import com.siperes.siperes.exception.ServiceBusinessException;
@@ -20,7 +17,6 @@ import com.siperes.siperes.model.*;
 import com.siperes.siperes.model.json.IngredientDetailJson;
 import com.siperes.siperes.model.json.RecipeDetailJson;
 import com.siperes.siperes.model.json.StepJson;
-import com.siperes.siperes.model.key.CopyDetailKey;
 import com.siperes.siperes.repository.*;
 import com.siperes.siperes.repository.specification.RecipeSpecification;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +52,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeHistoryRepository recipeHistoryRepository;
     private final UserRepository userRepository;
     private final CopyDetailRepository copyDetailRepository;
+    private final ModificationRequestRepository modificationRequestRepository;
 
     @Transactional
     @Override
@@ -462,9 +459,31 @@ public class RecipeServiceImpl implements RecipeService {
             recipeRepository.findFirstByRecipeSlugAndUserAndStatus(recipeSlug, user, EnumStatus.ACTIVE)
                     .ifPresentOrElse(recipe -> {
                         if (!recipe.getCopyRecipeCopyDetails().isEmpty()) {
-                            copyDetailRepository.deleteByCopyRecipeId(recipe.getId());
+                            for (CopyDetail copyDetail : recipe.getCopyRecipeCopyDetails()) {
+                                List<ModificationRequest> modificationRequests = copyDetail.getModificationRequests().stream()
+                                        .peek(val -> {
+                                            val.setCopyDetail(null);
+                                            modificationRequestRepository.save(val);
+                                        })
+                                        .filter(val -> val.getRequestStatus().equals(EnumRequestStatus.WAITING)).toList();
+                                if (!modificationRequests.isEmpty()) {
+                                    modificationRequestRepository.deleteAll(modificationRequests);
+                                }
+                                copyDetailRepository.delete(copyDetail);
+                            }
                         }
                         if (!recipe.getOriginalRecipeCopyDetails().isEmpty()) {
+                            recipe.getOriginalRecipeCopyDetails().forEach(copyDetail -> {
+                                List<ModificationRequest> modificationRequests = copyDetail.getModificationRequests().stream()
+                                        .peek(val -> {
+                                            val.setCopyDetail(null);
+                                            modificationRequestRepository.save(val);
+                                        })
+                                        .filter(val -> val.getRequestStatus().equals(EnumRequestStatus.WAITING)).toList();
+                                modificationRequestRepository.saveAll(modificationRequests.stream()
+                                        .peek(val -> val.setRequestStatus(EnumRequestStatus.FAILED))
+                                        .collect(Collectors.toList()));
+                            });
                             recipe.getOriginalRecipeCopyDetails().clear();
                         }
                         recipeHistoryRepository.deleteByRecipeId(recipe.getId());
@@ -744,7 +763,22 @@ public class RecipeServiceImpl implements RecipeService {
         try {
             Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatus(recipeSlug, EnumStatus.ACTIVE)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
-            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE)) {
+            Boolean isLogin = checkLogin();
+            User user = null;
+            boolean isNotAuthorized = true;
+            if (isLogin) {
+                user = jwtUtil.getUser();
+                if (!recipe.getCopyRecipeCopyDetails().isEmpty()) {
+                    Optional<CopyDetail> optionalCopyDetail = recipe.getCopyRecipeCopyDetails().stream().findFirst();
+                    if (optionalCopyDetail.isPresent()) {
+                        boolean isExistsRequest = optionalCopyDetail.get().getModificationRequests().stream()
+                                .anyMatch(val -> val.getRequestStatus().equals(EnumRequestStatus.WAITING));
+                        isNotAuthorized = !((optionalCopyDetail.get().getOriginalRecipe().getUser().equals(user) && isExistsRequest) || recipe.getUser().equals(user));
+                    }
+                }
+            }
+            User finalUser = user;
+            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE) && isNotAuthorized) {
                 throw new ForbiddenException(FORBIDDEN_ACCESS_PRIVATE);
             }
             String copyFromSlug = null;
@@ -754,12 +788,6 @@ public class RecipeServiceImpl implements RecipeService {
                     copyFromSlug = copyDetail.get().getOriginalRecipe().getRecipeSlug();
                 }
             }
-            Boolean isLogin = checkLogin();
-            User user = null;
-            if (checkLogin()) {
-                user = jwtUtil.getUser();
-            }
-            User finalUser = user;
             return RecipeDetailResponse.builder()
                     .recipeSlug(recipe.getRecipeSlug())
                     .recipeName(recipe.getRecipeName())
@@ -814,12 +842,59 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public Page<RecipeResponse> getCopyRecipeList(String recipeSlug, Pageable pageable) {
+        try {
+            Page<Recipe> recipePage = Optional.ofNullable(recipeRepository.findByStatusAndVisibilityAndRecipeTypeAndOriginalRecipeSlug(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, EnumRecipeType.COPY, recipeSlug, pageable))
+                    .filter(Page::hasContent)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            Boolean isLogin = checkLogin();
+            User user = null;
+            if (checkLogin()) {
+                user = jwtUtil.getUser();
+            }
+            User finalUser = user;
+            return recipePage.map(recipe -> RecipeResponse.builder()
+                    .recipeSlug(recipe.getRecipeSlug())
+                    .recipeName(recipe.getRecipeName())
+                    .thumbnailImageLink(recipe.getThumbnailImageLink())
+                    .totalRating(recipe.getTotalRating())
+                    .createdAt(recipe.getCreatedAt().toLocalDate())
+                    .canBookmark(Optional.ofNullable(finalUser)
+                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .orElse(isLogin))
+                    .isBookmarked(Optional.ofNullable(finalUser)
+                            .map(val -> recipe.getBookmarks().contains(val))
+                            .orElse(null))
+                    .build());
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_LIST);
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public RecipeHistoryListResponse getRecipeHistories(String recipeSlug, Pageable pageable) {
         try {
             Recipe recipe = recipeRepository.findFirstByRecipeSlugAndStatus(recipeSlug, EnumStatus.ACTIVE)
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_HISTORY_NOT_FOUND));
-            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE)) {
+            Boolean isLogin = checkLogin();
+            boolean isNotAuthorized = true;
+            if (isLogin) {
+                User user = jwtUtil.getUser();
+                if (!recipe.getCopyRecipeCopyDetails().isEmpty()) {
+                    Optional<CopyDetail> optionalCopyDetail = recipe.getCopyRecipeCopyDetails().stream().findFirst();
+                    if (optionalCopyDetail.isPresent()) {
+                        boolean isExistsRequest = optionalCopyDetail.get().getModificationRequests().stream()
+                                .anyMatch(val -> val.getRequestStatus().equals(EnumRequestStatus.WAITING));
+                        isNotAuthorized = !((optionalCopyDetail.get().getOriginalRecipe().getUser().equals(user) && isExistsRequest) || recipe.getUser().equals(user));
+                    }
+                }
+            }
+            if (recipe.getVisibility().equals(EnumVisibility.PRIVATE) && isNotAuthorized) {
                 throw new ForbiddenException(FORBIDDEN_ACCESS_PRIVATE);
             }
             Page<RecipeHistory> recipeHistoryPage = Optional.of(recipeHistoryRepository.findByRecipe(recipe, pageable))
@@ -930,7 +1005,7 @@ public class RecipeServiceImpl implements RecipeService {
             if (user.equals(recipe.getUser())) {
                 throw new ForbiddenException(FORBIDDEN_COPY);
             }
-            if (recipeRepository.countCopyRecipe(user, recipe) >= 3) {
+            if (recipeRepository.countCopyRecipe(user, recipe, EnumStatus.ACTIVE) >= 3) {
                 throw new ForbiddenException(MAX_COPY_RECIPE);
             }
             CompletableFuture<String> image = imageUtil.downloadImageAsBase64(recipe.getThumbnailImageLink());
@@ -966,12 +1041,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .user(user)
                     .build();
             Recipe finalRecipe = recipeRepository.save(newRecipe);
-            CopyDetailKey key = CopyDetailKey.builder()
-                    .originalRecipeId(recipe.getId())
-                    .copyRecipeId(finalRecipe.getId())
-                    .build();
             CopyDetail copyDetail = CopyDetail.builder()
-                    .id(key)
                     .originalRecipe(recipe)
                     .copyRecipe(finalRecipe)
                     .build();

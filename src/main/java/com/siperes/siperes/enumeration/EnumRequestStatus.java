@@ -3,5 +3,6 @@ package com.siperes.siperes.enumeration;
 public enum EnumRequestStatus {
     APPROVED,
     REJECTED,
-    WAITING
+    WAITING,
+    FAILED
 }

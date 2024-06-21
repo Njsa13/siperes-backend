@@ -25,7 +25,17 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
     List<Recipe> findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus status, EnumVisibility visibility, EnumRecipeType recipeType);
     Page<Recipe> findAll(Specification<Recipe> specification, Pageable pageable);
     @Query("""
-            SELECT COUNT(r) FROM Recipe r LEFT JOIN r.copyRecipeCopyDetails c WHERE r.user = :user AND c.originalRecipe = :originalRecipe
+            SELECT COUNT(r) FROM Recipe r
+            LEFT JOIN r.copyRecipeCopyDetails c
+            WHERE r.user = :user AND c.originalRecipe = :originalRecipe AND r.status = :status
             """)
-    Long countCopyRecipe(User user, Recipe originalRecipe);
+    Long countCopyRecipe(User user, Recipe originalRecipe, EnumStatus status);
+
+    @Query("""
+            SELECT r FROM Recipe r
+            LEFT JOIN r.copyRecipeCopyDetails c
+            LEFT JOIN c.originalRecipe o
+            WHERE r.status = :status AND r.visibility = :visibility AND r.recipeType = :recipeType And o.recipeSlug = :originalRecipeSlug
+            """)
+    Page<Recipe> findByStatusAndVisibilityAndRecipeTypeAndOriginalRecipeSlug(EnumStatus status, EnumVisibility visibility, EnumRecipeType recipeType, String originalRecipeSlug, Pageable pageable);
 }
