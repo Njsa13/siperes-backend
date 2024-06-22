@@ -24,6 +24,7 @@ public class MyRecipeDetailResponse {
     private String owner;
     private Integer portion;
     private Double totalRating;
+    private Integer totalReviewers;
     private EnumVisibility visibility;
     private EnumRecipeType recipeType;
     private String copyFromSlug;

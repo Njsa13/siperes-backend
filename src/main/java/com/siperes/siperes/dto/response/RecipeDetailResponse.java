@@ -2,7 +2,6 @@ package com.siperes.siperes.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.siperes.siperes.enumeration.EnumRecipeType;
-import com.siperes.siperes.enumeration.EnumVisibility;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +28,7 @@ public class RecipeDetailResponse {
     private LocalDate createdAt;
     private Boolean canBookmark;
     private Boolean canCopy;
+    private Boolean canReview;
     private Boolean isBookmarked;
     private List<IngredientDetailResponse> ingredientDetailResponses;
     private List<StepDetailResponse> stepDetailResponses;

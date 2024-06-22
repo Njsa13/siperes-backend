@@ -9,6 +9,7 @@ import com.siperes.siperes.dto.request.UpdateUserDetailRequest;
 import com.siperes.siperes.dto.response.UpdateProfileImageResponse;
 import com.siperes.siperes.dto.response.UpdateUserDetailResponse;
 import com.siperes.siperes.dto.response.UserDetailResponse;
+import com.siperes.siperes.dto.response.UserResponse;
 import com.siperes.siperes.exception.DataConflictException;
 import com.siperes.siperes.exception.DataNotFoundException;
 import com.siperes.siperes.exception.ServiceBusinessException;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService{
         try {
             User user = jwtUtil.getUser();
             return UserDetailResponse.builder()
-                    .username(user.getUsername())
+                    .username(user.getUserName())
                     .name(user.getName())
                     .email(user.getEmail())
                     .isEmailVerified(user.getIsVerifiedEmail())
@@ -67,12 +68,12 @@ public class UserServiceImpl implements UserService{
         try {
             User user = jwtUtil.getUser();
             checkDataUtil.checkDataField("users", "username", request.getUsername(), "user_id", user.getId());
-            user.setUsername(request.getUsername());
+            user.setUserName(request.getUsername());
             user.setName(request.getName());
             user.setDateOfBirth(request.getDateOfBirth().atStartOfDay());
             user = userRepository.save(user);
             return UpdateUserDetailResponse.builder()
-                    .username(user.getUsername())
+                    .username(user.getUserName())
                     .name(user.getName())
                     .dateOfBirth(Optional.ofNullable(user.getDateOfBirth())
                             .map(LocalDateTime::toLocalDate)
@@ -151,6 +152,25 @@ public class UserServiceImpl implements UserService{
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ServiceBusinessException(FAILED_CHANGE_PASSWORD);
+        }
+    }
+
+    @Override
+    public UserResponse getOtherUserProfile(String username) {
+        try {
+            User user = userRepository.findFirstByUserName(username)
+                    .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND));
+            return UserResponse.builder()
+                    .username(user.getUserName())
+                    .name(user.getName())
+                    .profileImageLink(user.getProfileImageLink())
+                    .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_OTHER_USER_PROFILE);
         }
     }
 }

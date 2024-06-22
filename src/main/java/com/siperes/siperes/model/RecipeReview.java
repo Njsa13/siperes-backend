@@ -1,33 +1,32 @@
 package com.siperes.siperes.model;
 
+import com.siperes.siperes.model.key.RecipeReviewKey;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Builder
+@EqualsAndHashCode(of = {"key", "rating", "comment"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "recipe_review")
 public class RecipeReview {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "recipe_review_id")
-    private UUID id;
+    @EmbeddedId
+    private RecipeReviewKey key;
 
     @Column(nullable = false)
-    private Double rating;
+    private Integer rating;
 
     @Column(nullable = false)
     private String comment;
+
+    @Column(name = "isEdit", nullable = false)
+    private Boolean isEdit;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -35,10 +34,12 @@ public class RecipeReview {
     @UpdateTimestamp
     private LocalDateTime updateAt;
 
+    @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
 
+    @MapsId("recipeId")
     @ManyToOne
     @JoinColumn(name = "recipe_id", referencedColumnName = "recipe_id", nullable = false)
     private Recipe recipe;

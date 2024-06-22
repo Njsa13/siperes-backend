@@ -12,6 +12,10 @@ public class Constants {
         public static final String BROWSE_RECIPE_PATS = BASE_URL + "/browse-recipe";
     }
 
+    public static final class OtherUserProfile {
+        public static final String OTHER_USER_PROFILE_PATS = BASE_URL + "/user";
+    }
+
     public static final class ManageUserProfile {
         public static final String MANAGE_USER_PROFILE_PATS = BASE_URL + "/me";
         public static final String MANAGE_USER_PROFILE_PATS_ALL = MANAGE_USER_PROFILE_PATS + "/**";
@@ -32,12 +36,18 @@ public class Constants {
         public static final String MANAGE_INGREDIENT_PATS_ALL = MANAGE_INGREDIENT_PATS + "/**";
     }
 
+    public static final class RecipeReview {
+        public static final String RECIPE_REVIEW_PATS = BASE_URL + "/review";
+        public static final String RECIPE_REVIEW_PATS_ALL = RECIPE_REVIEW_PATS + "/**";
+    }
+
     public static final class CommonPats {
             public static final String[] SECURE_LIST_PATS = {
                     ManageRecipe.MANAGE_RECIPE_PATS_ALL,
                     ManageIngredient.MANAGE_INGREDIENT_PATS_ALL,
                     ManageUserProfile.MANAGE_USER_PROFILE_PATS_ALL,
-                    ModificationRequest.MODIFICATION_REQUEST_PATS_ALL
+                    ModificationRequest.MODIFICATION_REQUEST_PATS_ALL,
+                    RecipeReview.RECIPE_REVIEW_PATS_ALL
             };
     }
 
@@ -95,6 +105,7 @@ public class Constants {
         public static final String IMAGE_PROFILE_NOT_FOUND = "Foto profile tidak ditemukan";
         public static final String ORIGINAL_RECIPE_NOT_FOUND = "Resep salinan tidak ditemukan atau resep tidak memiliki resep asal (Merupakah resep original atau resep asal telah dihapus)";
         public static final String MODIFICATION_REQUEST_NOT_FOUND = "penmintaan modifikasi tidak ditemukan";
+        public static final String RECIPE_REVIEW_NOT_FOUND = "Review tidak ditemukan";
         public static final String INPUT_CANNOT_NULL = "Input tidak boleh null atau empty";
         public static final String FAILED_CHECK_FIELD_EXISTS= "Gagal memeriksa keberadaan field";
         public static final String FILED_GET_TWO_WORDS = "Gagal mengambil 2 huruf pertama";
@@ -113,7 +124,12 @@ public class Constants {
         public static final String FAILED_RESET_PASSWORD = "Gagal mereset password";
         public static final String FAILED_DOWNLOAD_IMG = "Gagal Mengunduh gambar";
         public static final String FAILED_COPY_RECIPE = "Gagal menyalin resep";
+        public static final String FAILED_GET_OTHER_USER_PROFILE = "Gagal memuat datas user";
+        public static final String FAILED_WRITE_REVIEW = "Gagal menulis ulasan resep";
+        public static final String FAILED_GET_REVIEW = "Gagal memuat ulasan resep";
+        public static final String FAILED_DELETE_REVIEW = "Gagal menghapus ulasan resep";
         public static final String INVALID_SLUG = "Slug tidak valid";
+        public static final String CONFLICT_REVIEW = "Ulasan belum diubah";
         public static final String MAX_COPY_RECIPE = "Tidak bisa menyalin resep melebihi 3";
         public static final String FORBIDDEN_BOOKMARK = "Tidak dapat melakukan bookmark pada resep milik sendiri";
         public static final String FORBIDDEN_COPY = "Tidak dapat menyalin resep milik sendiri";
@@ -121,6 +137,7 @@ public class Constants {
         public static final String FORBIDDEN_APPROVE_REQUEST = "Tidak bisa menyetujui atau menolak permintaan modifikasi pada resep original";
         public static final String FORBIDDEN_PRIVATE_REQUEST = "Resep tujuan sedang di private";
         public static final String FORBIDDEN_EMPTY_HISTORIES = "Belum ada pembaruan pada resep salinan yang ingin anda ajukan";
+        public static final String FORBIDDEN_REVIEW = "Tidak dapat mengulas resep milik sendiri";
         public static final String EXISTS_REQUEST = "Sudah melakukan permintaan modifikasi sebelumnya dan masih berstatus menunggu";
     }
 
@@ -147,5 +164,7 @@ public class Constants {
         public static final String MAX_STEPS = "Jumlah langkah tidak boleh melebihi 40";
         public static final String UNKNOWN_ENUM = "Nilai enum tidak diketahuai: ";
         public static final String INGREDIENT_EXISTS = "Bahan sudah ada";
+        public static final String MAX_RATING = "Angka rating maksimal 5";
+        public static final String MIN_RATING = "Angka rating minimal 1";
     }
 }

@@ -43,7 +43,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                         () -> new DataNotFoundException(EMAIL_NOT_FOUND)
                 );
             } else {
-                user = userRepository.findFirstByUsername(credential).orElseThrow(
+                user = userRepository.findFirstByUserName(credential).orElseThrow(
                         () -> new DataNotFoundException(USERNAME_NOT_FOUND)
                 );
             }

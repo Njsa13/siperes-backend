@@ -43,6 +43,9 @@ public class Recipe {
     @Column(name = "total_rating", nullable = false)
     private Double totalRating;
 
+    @Column(name = "total_reviewers", nullable = false)
+    private Integer totalReviewers;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EnumVisibility visibility;

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-@EqualsAndHashCode(of = "username")
+@EqualsAndHashCode(of = "userName")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -27,8 +27,8 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(name = "username", nullable = false, unique = true)
+    private String userName;
 
     @Column(nullable = false)
     private String name;
@@ -100,6 +100,10 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return this.email;
+    }
+
+    public String getUserName() {
+        return this.userName;
     }
 
     @Override

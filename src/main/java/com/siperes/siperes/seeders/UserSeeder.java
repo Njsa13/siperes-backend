@@ -39,7 +39,7 @@ public class UserSeeder implements CommandLineRunner {
             List<User> users = IntStream.range(0, adminUsernames.size())
                     .mapToObj(i -> {
                         User user = User.builder()
-                                .username(adminUsernames.get(i))
+                                .userName(adminUsernames.get(i))
                                 .name(adminNames.get(i))
                                 .email(adminEmails.get(i))
                                 .isVerifiedEmail(true)
@@ -47,7 +47,7 @@ public class UserSeeder implements CommandLineRunner {
                                 .role(EnumRole.ADMIN)
                                 .status(EnumStatus.ACTIVE).build();
 
-                        Boolean isUsernameExists = userRepository.existsByUsername(user.getUsername());
+                        Boolean isUsernameExists = userRepository.existsByUserName(user.getUserName());
                         Boolean isEmailExists = userRepository.existsByEmail(user.getEmail());
 
                         return !(isUsernameExists || isEmailExists) ? user : null;

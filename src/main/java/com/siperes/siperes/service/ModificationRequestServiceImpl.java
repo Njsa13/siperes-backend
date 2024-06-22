@@ -82,8 +82,8 @@ public class ModificationRequestServiceImpl implements ModificationRequestServic
                     .fromRecipeName(finalModificationRequest.getCopyDetail().getCopyRecipe().getRecipeName())
                     .toRecipeSlug(finalModificationRequest.getCopyDetail().getOriginalRecipe().getRecipeSlug())
                     .toRecipeName(finalModificationRequest.getCopyDetail().getOriginalRecipe().getRecipeName())
-                    .requestFrom(user.getUsername())
-                    .requestTo(finalModificationRequest.getCopyDetail().getOriginalRecipe().getUser().getUsername())
+                    .requestFrom(user.getUserName())
+                    .requestTo(finalModificationRequest.getCopyDetail().getOriginalRecipe().getUser().getUserName())
                     .build();
         } catch (DataNotFoundException | ForbiddenException | DataConflictException e) {
             log.info(e.getMessage());
@@ -110,7 +110,7 @@ public class ModificationRequestServiceImpl implements ModificationRequestServic
                             .createdAt(modificationRequest.getCreatedAt().toLocalDate())
                             .fromRecipeSlug(modificationRequest.getCopyDetail().getCopyRecipe().getRecipeSlug())
                             .fromRecipeName(modificationRequest.getCopyDetail().getCopyRecipe().getRecipeName())
-                            .requestTo(modificationRequest.getCopyDetail().getOriginalRecipe().getUser().getUsername())
+                            .requestTo(modificationRequest.getCopyDetail().getOriginalRecipe().getUser().getUserName())
                             .build();
                 } else {
                     return OutModificationReqResponse.builder()
@@ -121,7 +121,7 @@ public class ModificationRequestServiceImpl implements ModificationRequestServic
                             .fromRecipeName(modificationRequest.getCopyDetail().getCopyRecipe().getRecipeName())
                             .toRecipeSlug(modificationRequest.getCopyDetail().getOriginalRecipe().getRecipeSlug())
                             .toRecipeName(modificationRequest.getCopyDetail().getOriginalRecipe().getRecipeName())
-                            .requestTo(modificationRequest.getCopyDetail().getOriginalRecipe().getUser().getUsername())
+                            .requestTo(modificationRequest.getCopyDetail().getOriginalRecipe().getUser().getUserName())
                             .build();
                 }
             });
@@ -150,7 +150,7 @@ public class ModificationRequestServiceImpl implements ModificationRequestServic
                     .fromRecipeName(modificationRequest.getCopyDetail().getCopyRecipe().getRecipeName())
                     .toRecipeSlug(modificationRequest.getCopyDetail().getOriginalRecipe().getRecipeSlug())
                     .toRecipeName(modificationRequest.getCopyDetail().getOriginalRecipe().getRecipeName())
-                    .requestFrom(modificationRequest.getCopyDetail().getCopyRecipe().getUser().getUsername())
+                    .requestFrom(modificationRequest.getCopyDetail().getCopyRecipe().getUser().getUserName())
                     .canApprove(modificationRequest.getRequestStatus().equals(EnumRequestStatus.WAITING))
                     .build());
         } catch (DataNotFoundException e) {
@@ -177,7 +177,7 @@ public class ModificationRequestServiceImpl implements ModificationRequestServic
                     .toRecipeName(copyDetail.getOriginalRecipe().getRecipeName())
                     .thumbnailImageLink(copyDetail.getCopyRecipe().getThumbnailImageLink())
                     .createdAt(copyDetail.getCreatedAt().toLocalDate())
-                    .requestTo(copyDetail.getOriginalRecipe().getUser().getUsername())
+                    .requestTo(copyDetail.getOriginalRecipe().getUser().getUserName())
                     .build());
         } catch (DataNotFoundException e) {
             log.info(e.getMessage());

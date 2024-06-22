@@ -6,6 +6,7 @@ import com.siperes.siperes.dto.request.UpdateUserDetailRequest;
 import com.siperes.siperes.dto.response.UpdateProfileImageResponse;
 import com.siperes.siperes.dto.response.UpdateUserDetailResponse;
 import com.siperes.siperes.dto.response.UserDetailResponse;
+import com.siperes.siperes.dto.response.UserResponse;
 
 public interface UserService {
     UserDetailResponse getUserDetail();
@@ -13,4 +14,5 @@ public interface UserService {
     UpdateProfileImageResponse updateProfileImage(UpdateProfileImageRequest request);
     void deleteProfileImage();
     void changePassword(ChangePasswordRequest request);
+    UserResponse getOtherUserProfile(String username);
 }

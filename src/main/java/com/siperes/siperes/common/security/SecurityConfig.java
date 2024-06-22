@@ -17,6 +17,7 @@ import static com.siperes.siperes.common.util.Constants.CommonPats.SECURE_LIST_P
 import static com.siperes.siperes.common.util.Constants.ManageIngredient.MANAGE_INGREDIENT_PATS_ALL;
 import static com.siperes.siperes.common.util.Constants.ManageRecipe.MANAGE_RECIPE_PATS_ALL;
 import static com.siperes.siperes.common.util.Constants.ModificationRequest.MODIFICATION_REQUEST_PATS_ALL;
+import static com.siperes.siperes.common.util.Constants.RecipeReview.RECIPE_REVIEW_PATS_ALL;
 import static com.siperes.siperes.enumeration.EnumPermission.*;
 import static org.springframework.http.HttpMethod.*;
 
@@ -42,6 +43,10 @@ public class SecurityConfig {
                         .requestMatchers(POST, MODIFICATION_REQUEST_PATS_ALL).hasAnyAuthority(USER_CREATE.getPermission())
                         .requestMatchers(PUT, MODIFICATION_REQUEST_PATS_ALL).hasAnyAuthority(USER_UPDATE.getPermission())
                         .requestMatchers(DELETE, MODIFICATION_REQUEST_PATS_ALL).hasAnyAuthority(USER_DELETE.getPermission())
+                        .requestMatchers(GET, RECIPE_REVIEW_PATS_ALL).hasAnyAuthority(USER_READ.getPermission())
+                        .requestMatchers(POST, RECIPE_REVIEW_PATS_ALL).hasAnyAuthority(USER_CREATE.getPermission())
+                        .requestMatchers(PUT, RECIPE_REVIEW_PATS_ALL).hasAnyAuthority(USER_UPDATE.getPermission())
+                        .requestMatchers(DELETE, RECIPE_REVIEW_PATS_ALL).hasAnyAuthority(USER_DELETE.getPermission())
                         .requestMatchers(GET, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_READ.getPermission())
                         .requestMatchers(POST, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
                         .requestMatchers(PUT, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())

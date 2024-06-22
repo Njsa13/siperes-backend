@@ -19,6 +19,7 @@ public class RecipeResponse {
     private String recipeName;
     private String thumbnailImageLink;
     private Double totalRating;
+    private Integer totalReviewers;
     private LocalDate createdAt;
     private Boolean canBookmark;
     private Boolean isBookmarked;

@@ -52,7 +52,7 @@ public class AuthenticationController {
     public ResponseEntity<APIResultResponse<LoginResponse>> login(@RequestBody @Valid LoginRequest request) {
         LoginResponse response = authenticationService.login(request);
         APIResultResponse<LoginResponse> resultResponse = new APIResultResponse<>(
-                HttpStatus.CREATED,
+                HttpStatus.OK,
                 "Login berhasil",
                 response
         );

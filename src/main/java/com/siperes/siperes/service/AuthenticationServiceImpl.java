@@ -42,7 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public RegisterResponse register(RegisterRequest request) {
         try {
             User user = User.builder()
-                    .username(request.getUsername())
+                    .userName(request.getUsername())
                     .name(request.getName())
                     .email(request.getEmail())
                     .isVerifiedEmail(false)
@@ -72,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         () -> new DataNotFoundException(EMAIL_NOT_FOUND)
                 );
             } else {
-                user = userRepository.findFirstByUsername(request.getCredential()).orElseThrow(
+                user = userRepository.findFirstByUserName(request.getCredential()).orElseThrow(
                         () -> new DataNotFoundException(USERNAME_NOT_FOUND)
                 );
             }

@@ -1,7 +1,6 @@
 package com.siperes.siperes.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.siperes.siperes.enumeration.EnumRecipeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,18 +13,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MyRecipeResponse {
+public class WriteRecipeReviewResponse {
     private String recipeSlug;
-
-    private String recipeName;
-
-    private String thumbnailImageLink;
-
-    private Double totalRating;
-
-    private Integer totalReviewers;
-
-    private EnumRecipeType recipeType;
-
+    private String username;
+    private Integer rating;
+    private String comment;
     private LocalDate createdAt;
+    private LocalDate updatedAt;
+    private Double totalRating;
+    private Integer totalReviewers;
+    private Boolean isEdit;
 }

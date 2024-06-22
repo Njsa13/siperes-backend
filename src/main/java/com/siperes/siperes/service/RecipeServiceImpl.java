@@ -80,6 +80,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .thumbnailImageLink(thumbnailImageLink.join())
                     .portion(recipeRequest.getPortion())
                     .totalRating(0.0)
+                    .totalReviewers(0)
                     .visibility(recipeRequest.getVisibility())
                     .recipeType(EnumRecipeType.ORIGINAL)
                     .status(EnumStatus.ACTIVE)
@@ -304,7 +305,7 @@ public class RecipeServiceImpl implements RecipeService {
                                         .collect(Collectors.toList()))
                                 .orElse(Collections.emptyList()))
                         .build())
-                .createdBy(user.getUsername())
+                .createdBy(user.getUserName())
                 .recipe(finalRecipe)
                 .build();
         recipeHistoryRepository.save(recipeHistory);
@@ -515,6 +516,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
                     .totalRating(recipe.getTotalRating())
+                    .totalReviewers(recipe.getTotalReviewers())
                     .recipeType(recipe.getRecipeType())
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .build());
@@ -546,9 +548,10 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .about(recipe.getAbout())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
-                    .owner(user.getUsername())
+                    .owner(user.getUserName())
                     .portion(recipe.getPortion())
                     .totalRating(recipe.getTotalRating())
+                    .totalReviewers(recipe.getTotalReviewers())
                     .visibility(recipe.getVisibility())
                     .recipeType(recipe.getRecipeType())
                     .copyFromSlug(copyFromSlug)
@@ -599,6 +602,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
                     .totalRating(recipe.getTotalRating())
+                    .totalReviewers(recipe.getTotalReviewers())
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .canBookmark(true)
                     .isBookmarked(recipe.getBookmarks().contains(user))
@@ -739,9 +743,10 @@ public class RecipeServiceImpl implements RecipeService {
                             .recipeName(recipe.getRecipeName())
                             .thumbnailImageLink(recipe.getThumbnailImageLink())
                             .totalRating(recipe.getTotalRating())
+                            .totalReviewers(recipe.getTotalReviewers())
                             .createdAt(recipe.getCreatedAt().toLocalDate())
                             .canBookmark(Optional.ofNullable(finalUser)
-                                    .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                                    .map(val -> !val.getUserName().equals(recipe.getUser().getUserName()))
                                     .orElse(isLogin))
                             .isBookmarked(Optional.ofNullable(finalUser)
                                     .map(val -> recipe.getBookmarks().contains(val))
@@ -793,17 +798,20 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .about(recipe.getAbout())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
-                    .owner(recipe.getUser().getUsername())
+                    .owner(recipe.getUser().getUserName())
                     .portion(recipe.getPortion())
                     .totalRating(recipe.getTotalRating())
                     .recipeType(recipe.getRecipeType())
                     .copyFromSlug(copyFromSlug)
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .canBookmark(Optional.ofNullable(finalUser)
-                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .map(val -> !val.getUserName().equals(recipe.getUser().getUserName()))
                             .orElse(isLogin))
                     .canCopy(Optional.ofNullable(finalUser)
-                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .map(val -> !val.getUserName().equals(recipe.getUser().getUserName()))
+                            .orElse(isLogin))
+                    .canReview(Optional.ofNullable(finalUser)
+                            .map(val -> !val.getUserName().equals(recipe.getUser().getUserName()))
                             .orElse(isLogin))
                     .isBookmarked(Optional.ofNullable(finalUser)
                             .map(val -> recipe.getBookmarks().contains(val))
@@ -858,9 +866,10 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
                     .totalRating(recipe.getTotalRating())
+                    .totalReviewers(recipe.getTotalReviewers())
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .canBookmark(Optional.ofNullable(finalUser)
-                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .map(val -> !val.getUserName().equals(recipe.getUser().getUserName()))
                             .orElse(isLogin))
                     .isBookmarked(Optional.ofNullable(finalUser)
                             .map(val -> recipe.getBookmarks().contains(val))
@@ -975,9 +984,10 @@ public class RecipeServiceImpl implements RecipeService {
                     .recipeName(recipe.getRecipeName())
                     .thumbnailImageLink(recipe.getThumbnailImageLink())
                     .totalRating(recipe.getTotalRating())
+                    .totalReviewers(recipe.getTotalReviewers())
                     .createdAt(recipe.getCreatedAt().toLocalDate())
                     .canBookmark(Optional.ofNullable(finalUser)
-                            .map(val -> !val.getUsername().equals(recipe.getUser().getUsername()))
+                            .map(val -> !val.getUserName().equals(recipe.getUser().getUserName()))
                             .orElse(isLogin))
                     .isBookmarked(Optional.ofNullable(finalUser)
                             .map(val -> recipe.getBookmarks().contains(val))
@@ -1035,6 +1045,7 @@ public class RecipeServiceImpl implements RecipeService {
                     .thumbnailImageLink(thumbnailImageLink.join())
                     .portion(recipe.getPortion())
                     .totalRating(0.0)
+                    .totalReviewers(0)
                     .visibility(EnumVisibility.PUBLIC)
                     .recipeType(EnumRecipeType.COPY)
                     .status(EnumStatus.ACTIVE)
@@ -1108,6 +1119,43 @@ public class RecipeServiceImpl implements RecipeService {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ServiceBusinessException(FAILED_COPY_RECIPE);
+        }
+    }
+
+    @Override
+    public Page<RecipeResponse> getOtherUserRecipe(String username, Pageable pageable) {
+        try {
+            User otherUser = userRepository.findFirstByUserName(username)
+                    .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND));
+            Page<Recipe> recipePage = Optional.ofNullable(recipeRepository.findByStatusAndVisibilityAndUser(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, otherUser, pageable))
+                    .filter(Page::hasContent)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            Boolean isLogin = checkLogin();
+            User user = null;
+            if (checkLogin()) {
+                user = jwtUtil.getUser();
+            }
+            User finalUser = user;
+            return recipePage.map(recipe -> RecipeResponse.builder()
+                    .recipeSlug(recipe.getRecipeSlug())
+                    .recipeName(recipe.getRecipeName())
+                    .thumbnailImageLink(recipe.getThumbnailImageLink())
+                    .totalRating(recipe.getTotalRating())
+                    .totalReviewers(recipe.getTotalReviewers())
+                    .createdAt(recipe.getCreatedAt().toLocalDate())
+                    .canBookmark(Optional.ofNullable(finalUser)
+                            .map(val -> !val.getUserName().equals(recipe.getUser().getUserName()))
+                            .orElse(isLogin))
+                    .isBookmarked(Optional.ofNullable(finalUser)
+                            .map(val -> recipe.getBookmarks().contains(val))
+                            .orElse(null))
+                    .build());
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_LIST);
         }
     }
 
