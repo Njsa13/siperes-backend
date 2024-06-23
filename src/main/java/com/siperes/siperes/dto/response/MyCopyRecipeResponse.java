@@ -20,4 +20,5 @@ public class MyCopyRecipeResponse {
     private String thumbnailImageLink;
     private LocalDate createdAt;
     private String requestTo;
+    private Boolean isWaiting;
 }

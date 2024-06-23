@@ -178,6 +178,8 @@ public class ModificationRequestServiceImpl implements ModificationRequestServic
                     .thumbnailImageLink(copyDetail.getCopyRecipe().getThumbnailImageLink())
                     .createdAt(copyDetail.getCreatedAt().toLocalDate())
                     .requestTo(copyDetail.getOriginalRecipe().getUser().getUserName())
+                    .isWaiting(copyDetail.getModificationRequests().stream()
+                            .anyMatch(val -> val.getRequestStatus().equals(EnumRequestStatus.WAITING)))
                     .build());
         } catch (DataNotFoundException e) {
             log.info(e.getMessage());
