@@ -11,7 +11,7 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 public class RecipeSpecification {
-    public static Specification<Recipe> hasRecipeNameOrIngredientName(String keyword) {
+    public static Specification<Recipe> hasRecipeNameOrIngredientNameWithEnum(String keyword) {
         return (root, query, criteriaBuilder) -> {
             query.distinct(true);
 
@@ -44,10 +44,23 @@ public class RecipeSpecification {
         };
     }
 
-    public static Specification<Recipe> orderByRating() {
+    public static Specification<Recipe> orderByPopularity() {
         return (root, query, criteriaBuilder) -> {
-            query.orderBy(criteriaBuilder.desc(root.get("totalRating")));
+            query.orderBy(criteriaBuilder.desc(root.get("popularityRate")));
             return criteriaBuilder.conjunction();
+        };
+    }
+
+    public static Specification<Recipe> hasRecipeNameOrIngredientName(String keyword) {
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            if (keyword == null || keyword.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            Join<Recipe, IngredientDetail> ingredientDetailJoin = root.join("ingredientDetails", JoinType.LEFT);
+            Predicate recipeNamePredicate = criteriaBuilder.like(root.get("recipeName"), "%" + keyword + "%");
+            Predicate ingredientNamePredicate = criteriaBuilder.like(ingredientDetailJoin.get("ingredientName"), "%" + keyword + "%");
+            return criteriaBuilder.or(recipeNamePredicate, ingredientNamePredicate);
         };
     }
 }

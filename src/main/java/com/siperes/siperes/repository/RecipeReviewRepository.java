@@ -38,6 +38,8 @@ public interface RecipeReviewRepository extends JpaRepository<RecipeReview, UUID
             """)
     Optional<RecipeReview> findFirstByUserIdAndRecipeSlug(User user, String recipeSlug);
 
+    Optional<RecipeReview> findFirstByUserIdAndRecipeId(UUID userId, UUID recipeId);
+
     @Query("""
             SELECT rr FROM RecipeReview rr
             LEFT JOIN rr.recipe r

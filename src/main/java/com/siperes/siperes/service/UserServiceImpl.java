@@ -6,18 +6,21 @@ import com.siperes.siperes.common.util.JwtUtil;
 import com.siperes.siperes.dto.request.ChangePasswordRequest;
 import com.siperes.siperes.dto.request.UpdateProfileImageRequest;
 import com.siperes.siperes.dto.request.UpdateUserDetailRequest;
-import com.siperes.siperes.dto.response.UpdateProfileImageResponse;
-import com.siperes.siperes.dto.response.UpdateUserDetailResponse;
-import com.siperes.siperes.dto.response.UserDetailResponse;
-import com.siperes.siperes.dto.response.UserResponse;
+import com.siperes.siperes.dto.response.*;
+import com.siperes.siperes.enumeration.EnumRole;
+import com.siperes.siperes.enumeration.EnumStatus;
 import com.siperes.siperes.exception.DataConflictException;
 import com.siperes.siperes.exception.DataNotFoundException;
 import com.siperes.siperes.exception.ServiceBusinessException;
 import com.siperes.siperes.model.User;
 import com.siperes.siperes.repository.UserRepository;
+import com.siperes.siperes.repository.specification.UserSpecification;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -171,6 +174,85 @@ public class UserServiceImpl implements UserService{
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ServiceBusinessException(FAILED_GET_OTHER_USER_PROFILE);
+        }
+    }
+
+    @Override
+    public Page<AdminUserResponse> getAllUserForAdmin(String username, Pageable pageable) {
+        try {
+            Specification<User> spec = UserSpecification.hasUsernameAndRole(username, EnumRole.USER);
+            Page<User> userPage = Optional.ofNullable(userRepository.findAll(spec, pageable))
+                    .filter(Page::hasContent)
+                    .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND));
+            return userPage.map(user -> AdminUserResponse.builder()
+                    .username(user.getUserName())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .isVerifiedEmail(user.getIsVerifiedEmail())
+                    .dateOfBirth(user.getDateOfBirth())
+                    .status(user.getStatus())
+                    .lastLogin(user.getLastLogin())
+                    .profileImageLink(user.getProfileImageLink())
+                    .createdAt(user.getCreatedAt())
+                    .updateAt(user.getUpdateAt())
+                    .build());
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_DATA_USER);
+        }
+    }
+
+    @Override
+    public StatusResponse changeUserStatus(String username) {
+        try {
+            User user = userRepository.findFirstByUserName(username)
+                    .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND));
+            if (user.getStatus().equals(EnumStatus.ACTIVE)) {
+                user.setStatus(EnumStatus.INACTIVE);
+            } else if (user.getStatus().equals(EnumStatus.INACTIVE)) {
+                user.setStatus(EnumStatus.ACTIVE);
+            }
+            user = userRepository.save(user);
+            return StatusResponse.builder()
+                    .status(user.getStatus())
+                    .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_CHANGE_USER_STATUS);
+        }
+    }
+
+    @Override
+    public UserInformation getUserInfo() {
+        try {
+            long totalUsers = userRepository.countUsersByRole(EnumRole.USER);
+            long totalActiveUser = userRepository.countUsersByRoleAndStatus(EnumRole.USER, EnumStatus.ACTIVE);
+            long totalInactiveUser = userRepository.countUsersByRoleAndStatus(EnumRole.USER, EnumStatus.INACTIVE);
+            long daily = userRepository.countUserLoginLast(EnumRole.USER, LocalDateTime.now().minusDays(1));
+            long weekly = userRepository.countUserLoginLast(EnumRole.USER, LocalDateTime.now().minusWeeks(1));
+            long monthly = userRepository.countUserLoginLast(EnumRole.USER, LocalDateTime.now().minusMonths(1));
+            return UserInformation.builder()
+                    .totalUser((int) totalUsers)
+                    .totalActiveUser((int) totalActiveUser)
+                    .totalInactiveUser((int) totalInactiveUser)
+                    .loginActiveUser(LoginActiveUser.builder()
+                            .daily((int) daily)
+                            .weekly((int) weekly)
+                            .monthly((int) monthly)
+                            .build())
+                    .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_USER_INFO);
         }
     }
 }

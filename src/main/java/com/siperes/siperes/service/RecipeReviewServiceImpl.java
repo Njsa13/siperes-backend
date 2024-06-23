@@ -15,7 +15,6 @@ import com.siperes.siperes.model.User;
 import com.siperes.siperes.model.key.RecipeReviewKey;
 import com.siperes.siperes.repository.RecipeRepository;
 import com.siperes.siperes.repository.RecipeReviewRepository;
-import com.siperes.siperes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -64,10 +63,12 @@ public class RecipeReviewServiceImpl implements RecipeReviewService{
                 throw new DataConflictException(CONFLICT_REVIEW);
             }
             recipeReview = recipeReviewRepository.save(recipeReview);
-            Double totalRating = recipeReviewRepository.averageByRecipeId(recipe.getId());
+            Double totalRating = Optional.ofNullable(recipeReviewRepository.averageByRecipeId(recipe.getId()))
+                    .orElse(0.0);
             long totalReviewers = recipeReviewRepository.countByRecipeId(recipe.getId());
             recipe.setTotalRating(totalRating);
             recipe.setTotalReviewers((int) totalReviewers);
+            recipe.setPopularityRate((totalRating * 0.5) + (totalReviewers * 0.3) + (recipe.getTotalBookmarks() * 0.2));
             recipe = recipeRepository.save(recipe);
             return WriteRecipeReviewResponse.builder()
                     .recipeSlug(recipe.getRecipeSlug())
@@ -122,7 +123,18 @@ public class RecipeReviewServiceImpl implements RecipeReviewService{
             if (recipe.getUser().equals(user)) {
                 throw new ForbiddenException(FORBIDDEN_REVIEW);
             }
+            RecipeReview recipeReview = recipeReviewRepository.findFirstByUserIdAndRecipeId(user.getId(), recipe.getId())
+                    .orElseThrow(() -> new DataNotFoundException(FORBIDDEN_NOT_EXIST_REVIEW));
+            user.getRecipeReviews().remove(recipeReview);
+            recipe.getRecipeReviews().remove(recipeReview);
             recipeReviewRepository.deleteByUserIdAndRecipeId(user.getId(), recipe.getId());
+            Double totalRating = Optional.ofNullable(recipeReviewRepository.averageByRecipeId(recipe.getId()))
+                    .orElse(0.0);
+            long totalReviewers = recipeReviewRepository.countByRecipeId(recipe.getId());
+            recipe.setTotalRating(totalRating);
+            recipe.setTotalReviewers((int) totalReviewers);
+            recipe.setPopularityRate((totalRating * 0.5) + (totalReviewers * 0.3) + (recipe.getTotalBookmarks() * 0.2));
+            recipeRepository.save(recipe);
         } catch (DataNotFoundException | ForbiddenException e) {
             log.info(e.getMessage());
             throw e;

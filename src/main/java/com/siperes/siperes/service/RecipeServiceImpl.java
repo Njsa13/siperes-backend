@@ -10,6 +10,7 @@ import com.siperes.siperes.dto.request.UpdateIngredientDetailRequest;
 import com.siperes.siperes.dto.request.UpdateRecipeRequest;
 import com.siperes.siperes.dto.response.*;
 import com.siperes.siperes.enumeration.*;
+import com.siperes.siperes.exception.DataConflictException;
 import com.siperes.siperes.exception.DataNotFoundException;
 import com.siperes.siperes.exception.ForbiddenException;
 import com.siperes.siperes.exception.ServiceBusinessException;
@@ -22,6 +23,7 @@ import com.siperes.siperes.repository.specification.RecipeSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -30,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -81,6 +84,8 @@ public class RecipeServiceImpl implements RecipeService {
                     .portion(recipeRequest.getPortion())
                     .totalRating(0.0)
                     .totalReviewers(0)
+                    .totalBookmarks(0)
+                    .popularityRate(0.0)
                     .visibility(recipeRequest.getVisibility())
                     .recipeType(EnumRecipeType.ORIGINAL)
                     .status(EnumStatus.ACTIVE)
@@ -686,11 +691,16 @@ public class RecipeServiceImpl implements RecipeService {
             if (user.equals(recipe.getUser())) {
                 throw new ForbiddenException(FORBIDDEN_BOOKMARK);
             }
+            if (userRepository.existsBookmarkByUserIdAndRecipeId(user.getId(), recipe.getId())) {
+                throw new DataConflictException(FORBIDDEN_EXIST_BOOKMARK);
+            }
+            recipe.setTotalBookmarks((int) recipeRepository.countBookmarksByRecipeId(recipe.getId()) + 1);
+            recipe.setPopularityRate((recipe.getTotalRating() * 0.5) + (recipe.getTotalReviewers() * 0.3) + (recipe.getTotalBookmarks() * 0.2));
             user.getBookmarks().add(recipe);
             recipe.getBookmarks().add(user);
             userRepository.save(user);
             recipeRepository.save(recipe);
-        } catch (DataNotFoundException | ForbiddenException e) {
+        } catch (DataNotFoundException | ForbiddenException | DataConflictException e) {
             log.info(e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -712,6 +722,11 @@ public class RecipeServiceImpl implements RecipeService {
             if (user.equals(recipe.getUser())) {
                 throw new ForbiddenException(FORBIDDEN_BOOKMARK);
             }
+            if (!userRepository.existsBookmarkByUserIdAndRecipeId(user.getId(), recipe.getId())) {
+                throw new DataNotFoundException(FORBIDDEN_NOT_EXIST_BOOKMARK);
+            }
+            recipe.setTotalBookmarks((int) recipeRepository.countBookmarksByRecipeId(recipe.getId()) - 1);
+            recipe.setPopularityRate((recipe.getTotalRating() * 0.5) + (recipe.getTotalReviewers() * 0.3) + (recipe.getTotalBookmarks() * 0.2));
             user.getBookmarks().remove(recipe);
             recipe.getBookmarks().remove(user);
             userRepository.save(user);
@@ -958,7 +973,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional(readOnly = true)
     public Page<RecipeResponse> searchAndSortingRecipe(String keyword, EnumSortBy sortBy, Pageable pageable) {
         try {
-            Specification<Recipe> specification = Specification.where(RecipeSpecification.hasRecipeNameOrIngredientName(keyword));
+            Specification<Recipe> specification = Specification.where(RecipeSpecification.hasRecipeNameOrIngredientNameWithEnum(keyword));
             if (sortBy != null) {
                 if (sortBy.equals(EnumSortBy.NEWEST)) {
                     specification = specification.and(RecipeSpecification.orderByCreatedAt(false));
@@ -967,7 +982,7 @@ public class RecipeServiceImpl implements RecipeService {
                     specification = specification.and(RecipeSpecification.orderByCreatedAt(true));
                 }
                 if (sortBy.equals(EnumSortBy.POPULAR)) {
-                    specification = specification.and(RecipeSpecification.orderByRating());
+                    specification = specification.and(RecipeSpecification.orderByPopularity());
                 }
             }
             Page<Recipe> recipePage = Optional.of(recipeRepository.findAll(specification, pageable))
@@ -1046,6 +1061,8 @@ public class RecipeServiceImpl implements RecipeService {
                     .portion(recipe.getPortion())
                     .totalRating(0.0)
                     .totalReviewers(0)
+                    .totalBookmarks(0)
+                    .popularityRate(0.0)
                     .visibility(EnumVisibility.PUBLIC)
                     .recipeType(EnumRecipeType.COPY)
                     .status(EnumStatus.ACTIVE)
@@ -1123,6 +1140,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<RecipeResponse> getOtherUserRecipe(String username, Pageable pageable) {
         try {
             User otherUser = userRepository.findFirstByUserName(username)
@@ -1156,6 +1174,183 @@ public class RecipeServiceImpl implements RecipeService {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ServiceBusinessException(FAILED_GET_RECIPE_LIST);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AdminRecipeResponse> getAllRecipeForAdmin(String keyword, Pageable pageable) {
+        try {
+            Specification<Recipe> specification = Specification.where(RecipeSpecification.hasRecipeNameOrIngredientName(keyword));
+            Page<Recipe> recipePage = Optional.of(recipeRepository.findAll(specification, pageable))
+                    .filter(Page::hasContent)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            return recipePage.map(recipe -> AdminRecipeResponse.builder()
+                    .recipeSlug(recipe.getRecipeSlug())
+                    .recipeName(recipe.getRecipeName())
+                    .thumbnailImageLink(recipe.getThumbnailImageLink())
+                    .totalRating(recipe.getTotalRating())
+                    .totalReviewers(recipe.getTotalReviewers())
+                    .totalBookmarks(recipe.getTotalBookmarks())
+                    .visibility(recipe.getVisibility())
+                    .recipeType(recipe.getRecipeType())
+                    .status(recipe.getStatus())
+                    .createdAt(recipe.getCreatedAt())
+                    .updatedAt(recipe.getUpdateAt())
+                    .build());
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_LIST);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RecipeDetailResponse getRecipeDetailForAdmin(String recipeSlug) {
+        try {
+            Recipe recipe = recipeRepository.findFirstByRecipeSlug(recipeSlug)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            String copyFromSlug = null;
+            if (Objects.equals(recipe.getRecipeType(), EnumRecipeType.COPY)) {
+                Optional<CopyDetail> copyDetail = recipe.getCopyRecipeCopyDetails().stream().findFirst();
+                if (copyDetail.isPresent()) {
+                    copyFromSlug = copyDetail.get().getOriginalRecipe().getRecipeSlug();
+                }
+            }
+            return RecipeDetailResponse.builder()
+                    .recipeSlug(recipe.getRecipeSlug())
+                    .recipeName(recipe.getRecipeName())
+                    .about(recipe.getAbout())
+                    .thumbnailImageLink(recipe.getThumbnailImageLink())
+                    .owner(recipe.getUser().getUserName())
+                    .portion(recipe.getPortion())
+                    .totalRating(recipe.getTotalRating())
+                    .recipeType(recipe.getRecipeType())
+                    .copyFromSlug(copyFromSlug)
+                    .createdAt(recipe.getCreatedAt().toLocalDate())
+                    .canBookmark(false)
+                    .canCopy(false)
+                    .canReview(false)
+                    .isBookmarked(false)
+                    .ingredientDetailResponses(recipe.getIngredientDetails().stream()
+                            .map(ingredientDetail -> IngredientDetailResponse.builder()
+                                    .ingredientDetailSlug(ingredientDetail.getIngredientDetailSlug())
+                                    .ingredientName(ingredientDetail.getIngredientName())
+                                    .dose(ingredientDetail.getDose())
+                                    .ingredientResponse(Optional.ofNullable(ingredientDetail.getIngredient())
+                                            .map(ingredient -> IngredientResponse.builder()
+                                                    .ingredientSlug(ingredient.getIngredientSlug())
+                                                    .ingredientName(ingredient.getIngredientName())
+                                                    .imageLink(ingredient.getImageLink())
+                                                    .build())
+                                            .orElse(null))
+                                    .build())
+                            .sorted(Comparator.comparing(IngredientDetailResponse::getIngredientName))
+                            .collect(Collectors.toList()))
+                    .stepDetailResponses(recipe.getSteps().stream()
+                            .map(step -> StepDetailResponse.builder()
+                                    .stepSlug(step.getStepSlug())
+                                    .numberStep(step.getNumberStep())
+                                    .stepDescription(step.getStepDescription())
+                                    .build())
+                            .sorted(Comparator.comparingInt(StepDetailResponse::getNumberStep))
+                            .collect(Collectors.toList()))
+                    .build();
+        } catch (DataNotFoundException | ForbiddenException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_DETAIL);
+        }
+    }
+
+    @Override
+    @Transactional
+    public StatusResponse changeRecipeStatus(String recipeSlug) {
+        try {
+            Recipe recipe = recipeRepository.findFirstByRecipeSlug(recipeSlug)
+                    .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
+            if (!recipe.getCopyRecipeCopyDetails().isEmpty() && recipe.getStatus().equals(EnumStatus.ACTIVE)) {
+                CopyDetail copyDetail = recipe.getCopyRecipeCopyDetails().stream().findFirst().orElse(null);
+                if (copyDetail != null) {
+                    List<ModificationRequest> modificationRequests = copyDetail.getModificationRequests().stream()
+                            .filter(modificationRequest -> modificationRequest.getRequestStatus().equals(EnumRequestStatus.WAITING))
+                            .peek(modificationRequest -> modificationRequest.setRequestStatus(EnumRequestStatus.FAILED))
+                            .toList();
+                    modificationRequestRepository.saveAll(modificationRequests);
+                }
+            }
+            if (!recipe.getOriginalRecipeCopyDetails().isEmpty() && recipe.getStatus().equals(EnumStatus.ACTIVE)) {
+                recipe.getOriginalRecipeCopyDetails().forEach(copyDetail -> {
+                    List<ModificationRequest> modificationRequests = copyDetail.getModificationRequests().stream()
+                            .filter(val -> val.getRequestStatus().equals(EnumRequestStatus.WAITING))
+                            .peek(modificationRequest -> modificationRequest.setRequestStatus(EnumRequestStatus.FAILED))
+                            .toList();
+                    modificationRequestRepository.saveAll(modificationRequests);
+                });
+            }
+            if (recipe.getStatus().equals(EnumStatus.ACTIVE)) {
+                recipe.setStatus(EnumStatus.INACTIVE);
+            } else if (recipe.getStatus().equals(EnumStatus.INACTIVE)) {
+                recipe.setStatus(EnumStatus.ACTIVE);
+            }
+            recipe = recipeRepository.save(recipe);
+            return StatusResponse.builder()
+                    .status(recipe.getStatus())
+                    .build();
+        } catch (DataNotFoundException | ForbiddenException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_CHANGE_RECIPE_STATUS);
+        }
+    }
+
+    @Override
+    public RecipeInformation getRecipeInformation() {
+        try {
+            long totalRecipes = recipeRepository.countRecipes();
+            long totalActiveRecipes = recipeRepository.countRecipesByStatus(EnumStatus.ACTIVE);
+            long totalInactiveRecipes = recipeRepository.countRecipesByStatus(EnumStatus.INACTIVE);
+            long totalOriginalRecipes = recipeRepository.countRecipesByRecipeType(EnumRecipeType.ORIGINAL);
+            long totalCopyRecipes = recipeRepository.countRecipesByRecipeType(EnumRecipeType.COPY);
+            long daily = recipeRepository.countRecipesCreatedLast(LocalDateTime.now().minusDays(1));
+            long weekly = recipeRepository.countRecipesCreatedLast(LocalDateTime.now().minusWeeks(1));
+            long monthly = recipeRepository.countRecipesCreatedLast(LocalDateTime.now().minusMonths(1));
+            Pageable pageable = PageRequest.of(0, 3);
+            List<Recipe> recipes = recipeRepository.findOrderByPopularityRateDesc(pageable).stream()
+                    .toList();
+            return RecipeInformation.builder()
+                    .totalRecipes((int) totalRecipes)
+                    .totalActiveRecipes((int) totalActiveRecipes)
+                    .totalInactiveRecipes((int) totalInactiveRecipes)
+                    .totalOriginalRecipes((int) totalOriginalRecipes)
+                    .totalCopyRecipes((int) totalCopyRecipes)
+                    .newRecipes(NewRecipes.builder()
+                            .daily((int) daily)
+                            .weekly((int) weekly)
+                            .monthly((int) monthly)
+                            .build())
+                    .popularRecipes(recipes.stream()
+                            .map(recipe -> PopularRecipe.builder()
+                                    .recipeSlug(recipe.getRecipeSlug())
+                                    .recipeName(recipe.getRecipeName())
+                                    .totalReview(recipe.getTotalReviewers())
+                                    .rating(recipe.getTotalRating())
+                                    .build())
+                            .collect(Collectors.toList()))
+                    .build();
+        } catch (DataNotFoundException e) {
+            log.info(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ServiceBusinessException(FAILED_GET_RECIPE_INFORMATION);
         }
     }
 

@@ -36,6 +36,16 @@ public class Constants {
         public static final String MANAGE_INGREDIENT_PATS_ALL = MANAGE_INGREDIENT_PATS + "/**";
     }
 
+    public static final class AdminManageRecipe {
+        public static final String ADMIN_MANAGE_RECIPE_PATS = BASE_URL + "/manage-recipe";
+        public static final String ADMIN_MANAGE_RECIPE_PATS_ALL = ADMIN_MANAGE_RECIPE_PATS + "/**";
+    }
+
+    public static final class AdminManageUser {
+        public static final String ADMIN_MANAGE_USER_PATS = BASE_URL + "/manage-user";
+        public static final String ADMIN_MANAGE_USER_PATS_ALL = ADMIN_MANAGE_USER_PATS + "/**";
+    }
+
     public static final class RecipeReview {
         public static final String RECIPE_REVIEW_PATS = BASE_URL + "/review";
         public static final String RECIPE_REVIEW_PATS_ALL = RECIPE_REVIEW_PATS + "/**";
@@ -47,7 +57,9 @@ public class Constants {
                     ManageIngredient.MANAGE_INGREDIENT_PATS_ALL,
                     ManageUserProfile.MANAGE_USER_PROFILE_PATS_ALL,
                     ModificationRequest.MODIFICATION_REQUEST_PATS_ALL,
-                    RecipeReview.RECIPE_REVIEW_PATS_ALL
+                    RecipeReview.RECIPE_REVIEW_PATS_ALL,
+                    AdminManageRecipe.ADMIN_MANAGE_RECIPE_PATS_ALL,
+                    AdminManageUser.ADMIN_MANAGE_USER_PATS_ALL
             };
     }
 
@@ -96,6 +108,8 @@ public class Constants {
         public static final String FAILED_UPDATE_INGREDIENT = "Gagal memperbarui bahan";
         public static final String FAILED_DELETE_INGREDIENT = "Gagal menghapus bahan";
         public static final String FAILED_GET_INGREDIENT_LIST = "Gagal memuat daftar bahan";
+        public static final String FAILED_CHANGE_RECIPE_STATUS = "Gagal mengubah status resep";
+        public static final String FAILED_GET_RECIPE_INFORMATION = "Gagal mengubah status resep";
         public static final String RECIPE_NOT_FOUND = "Resep tidak ditemukan";
         public static final String RECIPE_HISTORY_NOT_FOUND = "Riwayat resep tidak ditemukan";
         public static final String RECIPE_HISTORY_DETAIL_NOT_FOUND = "Detail riwayat resep tidak ditemukan";
@@ -125,6 +139,9 @@ public class Constants {
         public static final String FAILED_DOWNLOAD_IMG = "Gagal Mengunduh gambar";
         public static final String FAILED_COPY_RECIPE = "Gagal menyalin resep";
         public static final String FAILED_GET_OTHER_USER_PROFILE = "Gagal memuat datas user";
+        public static final String FAILED_GET_DATA_USER = "Gagal memuat data user";
+        public static final String FAILED_CHANGE_USER_STATUS = "Gagal mengganti status user";
+        public static final String FAILED_GET_USER_INFO = "Gagal memuat informasi tentang user";
         public static final String FAILED_WRITE_REVIEW = "Gagal menulis ulasan resep";
         public static final String FAILED_GET_REVIEW = "Gagal memuat ulasan resep";
         public static final String FAILED_DELETE_REVIEW = "Gagal menghapus ulasan resep";
@@ -132,12 +149,16 @@ public class Constants {
         public static final String CONFLICT_REVIEW = "Ulasan belum diubah";
         public static final String MAX_COPY_RECIPE = "Tidak bisa menyalin resep melebihi 3";
         public static final String FORBIDDEN_BOOKMARK = "Tidak dapat melakukan bookmark pada resep milik sendiri";
+        public static final String FORBIDDEN_EXIST_BOOKMARK = "Resep sudah di bookmark";
+        public static final String FORBIDDEN_NOT_EXIST_BOOKMARK = "Bookmark sudah dihapus";
         public static final String FORBIDDEN_COPY = "Tidak dapat menyalin resep milik sendiri";
         public static final String FORBIDDEN_ACCESS_PRIVATE = "Tidak bisa mengakses resep private";
         public static final String FORBIDDEN_APPROVE_REQUEST = "Tidak bisa menyetujui atau menolak permintaan modifikasi pada resep original";
         public static final String FORBIDDEN_PRIVATE_REQUEST = "Resep tujuan sedang di private";
         public static final String FORBIDDEN_EMPTY_HISTORIES = "Belum ada pembaruan pada resep salinan yang ingin anda ajukan";
         public static final String FORBIDDEN_REVIEW = "Tidak dapat mengulas resep milik sendiri";
+        public static final String FORBIDDEN_NOT_EXIST_REVIEW = "Ulasan sudah dihapus";
+
         public static final String EXISTS_REQUEST = "Sudah melakukan permintaan modifikasi sebelumnya dan masih berstatus menunggu";
     }
 

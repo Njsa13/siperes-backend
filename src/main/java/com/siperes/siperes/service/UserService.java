@@ -3,10 +3,9 @@ package com.siperes.siperes.service;
 import com.siperes.siperes.dto.request.ChangePasswordRequest;
 import com.siperes.siperes.dto.request.UpdateProfileImageRequest;
 import com.siperes.siperes.dto.request.UpdateUserDetailRequest;
-import com.siperes.siperes.dto.response.UpdateProfileImageResponse;
-import com.siperes.siperes.dto.response.UpdateUserDetailResponse;
-import com.siperes.siperes.dto.response.UserDetailResponse;
-import com.siperes.siperes.dto.response.UserResponse;
+import com.siperes.siperes.dto.response.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
     UserDetailResponse getUserDetail();
@@ -15,4 +14,7 @@ public interface UserService {
     void deleteProfileImage();
     void changePassword(ChangePasswordRequest request);
     UserResponse getOtherUserProfile(String username);
+    Page<AdminUserResponse> getAllUserForAdmin(String username, Pageable pageable);
+    StatusResponse changeUserStatus(String username);
+    UserInformation getUserInfo();
 }

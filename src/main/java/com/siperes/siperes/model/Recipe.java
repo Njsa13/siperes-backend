@@ -46,6 +46,12 @@ public class Recipe {
     @Column(name = "total_reviewers", nullable = false)
     private Integer totalReviewers;
 
+    @Column(name = "total_bookmarks", nullable = false)
+    private Integer totalBookmarks;
+
+    @Column(name = "popularity_rate", nullable = false)
+    private Double popularityRate;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EnumVisibility visibility;
@@ -73,7 +79,7 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<RecipeHistory> recipeHistories;
 
-    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Set<RecipeReview> recipeReviews;
 
     @OneToMany(mappedBy = "originalRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY, orphanRemoval = true)

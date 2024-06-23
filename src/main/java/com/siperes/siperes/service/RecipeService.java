@@ -32,4 +32,8 @@ public interface RecipeService {
     Page<RecipeResponse> searchAndSortingRecipe(String keyword, EnumSortBy sortBy, Pageable pageable);
     CreateRecipeResponse copyRecipe(String recipeSlug);
     Page<RecipeResponse> getOtherUserRecipe(String username, Pageable pageable);
+    Page<AdminRecipeResponse> getAllRecipeForAdmin(String keyword, Pageable pageable);
+    RecipeDetailResponse getRecipeDetailForAdmin(String recipeSlug);
+    StatusResponse changeRecipeStatus(String recipeSlug);
+    RecipeInformation getRecipeInformation();
 }

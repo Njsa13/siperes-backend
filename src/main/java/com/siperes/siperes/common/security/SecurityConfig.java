@@ -13,6 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.siperes.siperes.common.util.Constants.AdminManageRecipe.ADMIN_MANAGE_RECIPE_PATS_ALL;
+import static com.siperes.siperes.common.util.Constants.AdminManageUser.ADMIN_MANAGE_USER_PATS_ALL;
 import static com.siperes.siperes.common.util.Constants.CommonPats.SECURE_LIST_PATS;
 import static com.siperes.siperes.common.util.Constants.ManageIngredient.MANAGE_INGREDIENT_PATS_ALL;
 import static com.siperes.siperes.common.util.Constants.ManageRecipe.MANAGE_RECIPE_PATS_ALL;
@@ -51,6 +53,14 @@ public class SecurityConfig {
                         .requestMatchers(POST, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
                         .requestMatchers(PUT, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
                         .requestMatchers(DELETE, MANAGE_INGREDIENT_PATS_ALL).hasAnyAuthority(ADMIN_DELETE.getPermission())
+                        .requestMatchers(GET, ADMIN_MANAGE_RECIPE_PATS_ALL).hasAnyAuthority(ADMIN_READ.getPermission())
+                        .requestMatchers(POST, ADMIN_MANAGE_RECIPE_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
+                        .requestMatchers(PUT, ADMIN_MANAGE_RECIPE_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                        .requestMatchers(DELETE, ADMIN_MANAGE_RECIPE_PATS_ALL).hasAnyAuthority(ADMIN_DELETE.getPermission())
+                        .requestMatchers(GET, ADMIN_MANAGE_USER_PATS_ALL).hasAnyAuthority(ADMIN_READ.getPermission())
+                        .requestMatchers(POST, ADMIN_MANAGE_USER_PATS_ALL).hasAnyAuthority(ADMIN_CREATE.getPermission())
+                        .requestMatchers(PUT, ADMIN_MANAGE_USER_PATS_ALL).hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                        .requestMatchers(DELETE, ADMIN_MANAGE_USER_PATS_ALL).hasAnyAuthority(ADMIN_DELETE.getPermission())
                         .requestMatchers(SECURE_LIST_PATS)
                         .authenticated()
                         .anyRequest()
