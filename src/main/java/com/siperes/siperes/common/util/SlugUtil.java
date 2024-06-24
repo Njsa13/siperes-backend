@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static com.siperes.siperes.common.util.Constants.ErrorMessage.FAILED_CHECK_FIELD_EXISTS;
@@ -26,11 +27,12 @@ public class SlugUtil {
                 }
                 final Slugify slg = Slugify.builder().build();
                 String slug = slg.slugify(input);
-                boolean checkSlug = isSlugExist(tableName, fieldName, slug);
+                String newSlug = slug + "-" + UUID.randomUUID();
+                boolean checkSlug = isSlugExist(tableName, fieldName, newSlug);
                 if (checkSlug) {
-                    slug = slug + "-" + System.currentTimeMillis();
+                    newSlug = slug + "-" + UUID.randomUUID();
                 }
-                return slug;
+                return newSlug;
             } catch (Exception e) {
                 throw new ServiceBusinessException(e.getMessage());
             }

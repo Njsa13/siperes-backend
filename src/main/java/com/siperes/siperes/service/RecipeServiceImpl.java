@@ -865,6 +865,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<RecipeResponse> getCopyRecipeList(String recipeSlug, Pageable pageable) {
         try {
             Page<Recipe> recipePage = Optional.ofNullable(recipeRepository.findByStatusAndVisibilityAndRecipeTypeAndOriginalRecipeSlug(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, EnumRecipeType.COPY, recipeSlug, pageable))
@@ -1312,6 +1313,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RecipeInformation getRecipeInformation() {
         try {
             long totalRecipes = recipeRepository.countRecipes();

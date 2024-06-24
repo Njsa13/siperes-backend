@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.siperes.siperes.common.util.Constants.ErrorMessage.*;
 
@@ -25,6 +26,7 @@ public class LogoutServiceImpl implements LogoutHandler {
     private final TokenRepository tokenRepository;
 
     @Override
+    @Transactional
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         try {
             final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);

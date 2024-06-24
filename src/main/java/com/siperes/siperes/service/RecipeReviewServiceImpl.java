@@ -93,6 +93,7 @@ public class RecipeReviewServiceImpl implements RecipeReviewService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RecipeReviewResponse getWriteRecipeReviewDetail(String recipeSlug) {
         try {
             User user = jwtUtil.getUser();
@@ -145,6 +146,7 @@ public class RecipeReviewServiceImpl implements RecipeReviewService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<RecipeReviewResponse> getAllRecipeReview(String recipeSlug, Pageable pageable) {
         try {
             Page<RecipeReview> recipeReviewPage = Optional.ofNullable(recipeReviewRepository.findByRecipeSlug(recipeSlug, pageable))

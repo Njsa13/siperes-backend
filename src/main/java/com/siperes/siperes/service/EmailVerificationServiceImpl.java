@@ -118,6 +118,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     }
 
     @Override
+    @Transactional
     public void verifyEmailTokenForgotPassword(ResetPasswordRequest request) {
         try {
             emailVerificationRepository.findFirstByTokenAndEmailVerificationType(request.getToken(), EnumEmailVerificationType.FORGOT_PASSWORD).ifPresentOrElse(emailVerification -> {

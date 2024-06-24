@@ -159,6 +159,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getOtherUserProfile(String username) {
         try {
             User user = userRepository.findFirstByUserName(username)
@@ -178,6 +179,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<AdminUserResponse> getAllUserForAdmin(String username, Pageable pageable) {
         try {
             Specification<User> spec = UserSpecification.hasUsernameAndRole(username, EnumRole.USER);
@@ -206,6 +208,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public StatusResponse changeUserStatus(String username) {
         try {
             User user = userRepository.findFirstByUserName(username)
@@ -229,6 +232,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserInformation getUserInfo() {
         try {
             long totalUsers = userRepository.countUsersByRole(EnumRole.USER);
