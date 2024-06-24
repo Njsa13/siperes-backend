@@ -52,6 +52,7 @@ jobs:
         run: |
           sshpass -p $SSH_PASSWORD scp -o StrictHostKeyChecking=no docker-compose.yml $VPS_USER@$VPS_HOST:/home/$VPS_USER/docker-compose.yml
           sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
+            sudo su
             echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
             docker pull $DOCKER_HUB_USERNAME/spiceswap:latest
             docker-compose -f /home/$VPS_USER/docker-compose.yml up -d
