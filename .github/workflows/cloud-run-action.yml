@@ -40,6 +40,17 @@ jobs:
               restart: always
               extra_hosts:
                 - "host.docker.internal:host-gateway"
+              environment:
+                - DATABASE_URL=${{secrets.DATABASE_URL}}
+                - DATABASE_USERNAME=${{secrets.DATABASE_USERNAME}}
+                - DATABASE_PASSWORD=${{secrets.DATABASE_PASSWORD}}
+                - SECRET_KEY=${{secrets.SECRET_KEY}}
+                - EMAIL_NAME=${{secrets.EMAIL_NAME}}
+                - EMAIL_PASSWORD=${{secrets.EMAIL_PASSWORD}}
+                - CLOUD_NAME=${{secrets.CLOUD_NAME}}
+                - API_KEY=${{secrets.API_KEY}}
+                - API_SECRET=${{secrets.API_SECRET}}
+                - DOMAIN=${{secrets.DOMAIN}}
           EOF
 
       - name: Deploy to VPS
