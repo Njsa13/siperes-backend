@@ -4,35 +4,55 @@ on: [push]
 
 jobs:
   build:
-    name: Cloud Run Deployment
+    name: VPS Deployment
     runs-on: ubuntu-latest
     steps:
 
       - name: Checkout
         uses: actions/checkout@main
 
-      - name: Setup GCP Service Account
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Configure Docker
+      - name: Build Docker Image
         run: |
-          gcloud auth configure-docker
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/spiceswap:latest .
 
-      - name: Build
+      - name: Login to Docker Hub
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/siperes:latest .
+          echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
-      - name: Push
+      - name: Push Docker Image to Docker Hub
         run: |
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/siperes:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/spiceswap:latest
 
-      - name: Deploy
+      - name: Install sshpass
         run: |
-          gcloud run deploy siperes \
-          --region asia-southeast1 \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/siperes \
-          --platform managed \
-          --allow-unauthenticated \
-          --project ${{ secrets.GCP_PROJECT_ID }}
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Create Docker Compose File
+        run: |
+          cat <<EOF > docker-compose.yml
+          version: '3'
+          services:
+            spiceswap:
+              image: ${{ secrets.DOCKER_HUB_USERNAME }}/spiceswap:latest
+              ports:
+                - "8080:8080"
+              restart: always
+              extra_hosts:
+                - "host.docker.internal:host-gateway"
+          EOF
+
+      - name: Deploy to VPS
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        run: |
+          sshpass -p $SSH_PASSWORD scp -o StrictHostKeyChecking=no docker-compose.yml $VPS_USER@$VPS_HOST:/home/$VPS_USER/docker-compose.yml
+          sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
+            echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+            docker pull $DOCKER_HUB_USERNAME/spiceswap:latest
+            docker-compose -f /home/$VPS_USER/docker-compose.yml up -d
+          EOF
