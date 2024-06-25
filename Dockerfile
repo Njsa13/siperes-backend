@@ -12,4 +12,4 @@ COPY --from=builder /app/target/siperes-*.jar /siperes.jar
 
 EXPOSE 8080
 
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/siperes.jar"]
+CMD ["java", "-Xms512m", "-Xmx2048m", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/siperes.jar"]
