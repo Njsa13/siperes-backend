@@ -744,7 +744,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional(readOnly = true)
     public List<RecipeResponse> getRecipeList() {
         try {
-            List<Recipe> recipes = Optional.ofNullable(recipeRepository.findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, EnumRecipeType.ORIGINAL))
+            List<Recipe> recipes = Optional.ofNullable(recipeRepository.findTop12ByStatusAndVisibilityAndRecipeTypeOrderByPopularityRateDesc(EnumStatus.ACTIVE, EnumVisibility.PUBLIC, EnumRecipeType.ORIGINAL))
                     .orElseThrow(() -> new DataNotFoundException(RECIPE_NOT_FOUND));
             Boolean isLogin = checkLogin();
             User user = null;

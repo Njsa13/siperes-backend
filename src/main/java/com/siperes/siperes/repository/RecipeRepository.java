@@ -25,7 +25,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
     Page<Recipe> findByBookmarksAndStatusAndVisibility(User bookmarks, EnumStatus status, EnumVisibility visibility, Pageable pageable);
     Optional<Recipe> findFirstByRecipeSlugAndStatus(String recipeSlug, EnumStatus status);
     Optional<Recipe> findFirstByRecipeSlug(String recipeSlug);
-    List<Recipe> findTop12ByStatusAndVisibilityAndRecipeTypeOrderByTotalRatingDesc(EnumStatus status, EnumVisibility visibility, EnumRecipeType recipeType);
+    List<Recipe> findTop12ByStatusAndVisibilityAndRecipeTypeOrderByPopularityRateDesc(EnumStatus status, EnumVisibility visibility, EnumRecipeType recipeType);
     Page<Recipe> findAll(Specification<Recipe> specification, Pageable pageable);
     Page<Recipe> findByStatusAndVisibilityAndUser(EnumStatus status, EnumVisibility visibility, User user, Pageable pageable);
     @Query("""

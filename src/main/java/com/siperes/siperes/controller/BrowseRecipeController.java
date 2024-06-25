@@ -4,6 +4,7 @@ import com.siperes.siperes.dto.response.*;
 import com.siperes.siperes.dto.response.base.APIResultResponse;
 import com.siperes.siperes.enumeration.EnumSortBy;
 import com.siperes.siperes.service.IngredientService;
+import com.siperes.siperes.service.RecipeReviewService;
 import com.siperes.siperes.service.RecipeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +28,7 @@ import static com.siperes.siperes.common.util.Constants.BrowseRecipe.BROWSE_RECI
 public class BrowseRecipeController {
     private final RecipeService recipeService;
     private final IngredientService ingredientService;
+    private final RecipeReviewService recipeReviewService;
 
     @GetMapping
     @Schema(name = "GetRecipeListRequest", description = "Get Recipe List request body")
@@ -133,6 +135,21 @@ public class BrowseRecipeController {
                 HttpStatus.OK,
                 "Behasil memuat daftar bahan",
                 responses);
+        return new ResponseEntity<>(resultResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/review-list")
+    @Schema(name = "GetAllRecipeReviewRequest", description = "Get All Recipe Review request body")
+    @Operation(summary = "Endpoint untuk mengambil daftar review resep")
+    public ResponseEntity<APIResultResponse<Page<RecipeReviewResponse>>> getAllRecipeReview(@RequestParam("recipeSlug") String recipeSlug,
+                                                                                            @RequestParam("page") Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<RecipeReviewResponse> responses = recipeReviewService.getAllRecipeReview(recipeSlug, pageable);
+        APIResultResponse<Page<RecipeReviewResponse>> resultResponse = new APIResultResponse<>(
+                HttpStatus.OK,
+                "Berhasil memuat daftar ulasan resep",
+                responses
+        );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 }
