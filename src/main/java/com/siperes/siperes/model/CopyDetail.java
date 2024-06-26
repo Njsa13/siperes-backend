@@ -27,11 +27,11 @@ public class CopyDetail {
     @OneToMany(mappedBy = "copyDetail", cascade =  CascadeType.MERGE, fetch = FetchType.EAGER)
     private Set<ModificationRequest> modificationRequests;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "original_recipe_id", referencedColumnName = "recipe_id", nullable = false)
     private Recipe originalRecipe;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "copy_recipe_id", referencedColumnName = "recipe_id", nullable = false)
     private Recipe copyRecipe;
 }
