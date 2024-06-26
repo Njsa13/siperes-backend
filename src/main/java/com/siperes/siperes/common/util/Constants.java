@@ -167,8 +167,8 @@ public class Constants {
         public static final String RESET_PASSWORD_TEXT = "Tekan link berikut untuk reset password: ";
         public static final String EMAIL_VERIFICATION_SUBJECT = "Verifikasi Email Siperes";
         public static final String EMAIL_VERIFICATION_TEXT = "Tekan link berikut untuk verifikasi email: ";
-        public static final String RESET_PASSWORD_URL = "https://spiceswap-svelte.vercel.app/email-verify-forgot-password?token=";
-        public static final String EMAIL_VERIFICATION_URL = "https://spiceswap-svelte.vercel.app/email-verify-register?token=";
+        public static final String RESET_PASSWORD_URL = "https://spiceswap.vercel.app/email-verify-forgot-password?token=";
+        public static final String EMAIL_VERIFICATION_URL = "https://spiceswap.vercel.app/email-verify-register?token=";
 
     }
 
