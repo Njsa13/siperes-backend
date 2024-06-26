@@ -88,7 +88,7 @@ public class Recipe {
     @OneToMany(mappedBy = "copyRecipe", cascade =  {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<CopyDetail> copyRecipeCopyDetails;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
 

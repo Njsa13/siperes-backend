@@ -42,7 +42,7 @@ public class RecipeHistory {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", referencedColumnName = "recipe_id", nullable = false)
     private Recipe recipe;
 }

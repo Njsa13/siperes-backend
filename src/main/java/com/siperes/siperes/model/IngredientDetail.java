@@ -36,11 +36,11 @@ public class IngredientDetail {
     @UpdateTimestamp
     private LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", referencedColumnName = "recipe_id", nullable = false)
     private Recipe recipe;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredient_id", referencedColumnName = "ingredient_id")
     private Ingredient ingredient;
 

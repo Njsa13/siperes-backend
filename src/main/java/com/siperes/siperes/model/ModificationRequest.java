@@ -30,7 +30,7 @@ public class ModificationRequest {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="copy_detail_id", referencedColumnName="copy_detail_id")
     private CopyDetail copyDetail;
 }
