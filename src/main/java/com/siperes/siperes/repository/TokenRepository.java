@@ -1,7 +1,9 @@
 package com.siperes.siperes.repository;
 
+import com.siperes.siperes.enumeration.EnumTokenAccessType;
 import com.siperes.siperes.model.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -19,4 +21,10 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
     List<Token> findAllValidTokenByUser(UUID id);
 
     Optional<Token> findByToken(String token);
+
+    @Modifying
+    void deleteByUserIdAndTokenAccessType(UUID userId, EnumTokenAccessType tokenAccessType);
+
+    @Modifying
+    void deleteByUserId(UUID userId);
 }

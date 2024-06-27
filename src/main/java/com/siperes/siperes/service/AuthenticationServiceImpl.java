@@ -92,6 +92,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             user.setLastLogin(LocalDateTime.now());
             userRepository.save(user);
 
+            tokenRepository.deleteByUserId(user.getId());
             saveToken(accessToken, user, EnumTokenAccessType.ACCESS);
             saveToken(refreshToken, user, EnumTokenAccessType.REFRESH);
 
@@ -129,6 +130,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new ForbiddenException(INVALID_TOKEN);
             }
             String accessToken = jwtUtil.generateToken(user);
+            tokenRepository.deleteByUserIdAndTokenAccessType(user.getId(), EnumTokenAccessType.ACCESS);
             saveToken(accessToken, user, EnumTokenAccessType.ACCESS);
             return RefreshTokenResponse.builder()
                     .accessToken(accessToken)
