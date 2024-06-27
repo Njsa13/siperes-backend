@@ -88,7 +88,7 @@ public class Constants {
         public static final String FAILED_ADD_ADMIN = "Gagal menambahkan data admin";
         public static final String FAILED_UPLOAD_IMG = "Gagal mengunggah gambar";
         public static final String FAILED_UPDATE_IMG = "Gagal mengupdate gambar";
-        public static final String FAILED_DELETE_IMG = "Gagal Menghapus gambar";
+        public static final String FAILED_DELETE_IMG = "Gagal menghapus gambar";
         public static final String FAILED_ADD_RECIPE = "Gagal membuat resep baru";
         public static final String FAILED_UPDATE_RECIPE = "Gagal memperbarui resep";
         public static final String FAILED_DELETE_RECIPE = "Gagal menghapus resep";
@@ -136,7 +136,7 @@ public class Constants {
         public static final String INVALID_CONFIRM_PASSWORD = "Password baru dan konfirmasi password tidak cocok";
         public static final String FAILED_CHANGE_PASSWORD = "Gagal mengganti password";
         public static final String FAILED_RESET_PASSWORD = "Gagal mereset password";
-        public static final String FAILED_DOWNLOAD_IMG = "Gagal Mengunduh gambar";
+        public static final String FAILED_DOWNLOAD_IMG = "Gagal mengunduh gambar";
         public static final String FAILED_COPY_RECIPE = "Gagal menyalin resep";
         public static final String FAILED_GET_OTHER_USER_PROFILE = "Gagal memuat datas user";
         public static final String FAILED_GET_DATA_USER = "Gagal memuat data user";
@@ -185,7 +185,7 @@ public class Constants {
         public static final String MAX_STEPS = "Jumlah langkah tidak boleh melebihi 40";
         public static final String UNKNOWN_ENUM = "Nilai enum tidak diketahuai: ";
         public static final String INGREDIENT_EXISTS = "Bahan sudah ada";
-        public static final String MAX_RATING = "Angka rating maksimal 5";
-        public static final String MIN_RATING = "Angka rating minimal 1";
+        public static final String MAX_RATING = "Nilai rating tidak valid";
+        public static final String MIN_RATING = "Nilai tating tidak valid";
     }
 }
