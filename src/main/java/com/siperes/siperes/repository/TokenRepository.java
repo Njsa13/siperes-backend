@@ -27,4 +27,6 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
 
     @Modifying
     void deleteByUserId(UUID userId);
+
+    boolean existsByToken(String token);
 }

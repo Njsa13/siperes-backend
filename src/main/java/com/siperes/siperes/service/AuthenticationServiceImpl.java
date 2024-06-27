@@ -130,8 +130,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new ForbiddenException(INVALID_TOKEN);
             }
             String accessToken = jwtUtil.generateToken(user);
-            tokenRepository.deleteByUserIdAndTokenAccessType(user.getId(), EnumTokenAccessType.ACCESS);
-            saveToken(accessToken, user, EnumTokenAccessType.ACCESS);
+            if (!tokenRepository.existsByToken(accessToken)) {
+                tokenRepository.deleteByUserIdAndTokenAccessType(user.getId(), EnumTokenAccessType.ACCESS);
+                saveToken(accessToken, user, EnumTokenAccessType.ACCESS);
+            }
             return RefreshTokenResponse.builder()
                     .accessToken(accessToken)
                     .build();
