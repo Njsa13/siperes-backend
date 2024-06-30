@@ -265,6 +265,8 @@ public class ModificationRequestServiceImpl implements ModificationRequestServic
 
             modificationRequest.setRequestStatus(EnumRequestStatus.APPROVED);
 
+            originalRecipe.getIngredientDetails().removeAll(originalRecipe.getIngredientDetails());
+            originalRecipe.getSteps().removeAll(originalRecipe.getSteps());
             ingredientDetailRepository.deleteByRecipeId(originalRecipe.getId());
             stepRepository.deleteByRecipeId(originalRecipe.getId());
             ingredientDetailRepository.saveAll(newIngredientDetails);
