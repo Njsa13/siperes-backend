@@ -8,11 +8,11 @@
 		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.siperes</groupId>
-	<artifactId>siperes</artifactId>
+	<groupId>com.spiceswap</groupId>
+	<artifactId>spiceswap</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>siperes</name>
-	<description>Siperes - Final Project Matkul Proyek Pemrograman</description>
+	<name>spiceswap</name>
+	<description>Spiceswap - Final Project Matkul Proyek Pemrograman</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
