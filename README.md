@@ -50,6 +50,8 @@ cloudinary.api-secret=your-api-secret
 The API documentation is generated using Swagger. Access the documentation by visiting `http://localhost:8080/docs` after running the application.
 
 ```bash
+# Usage
+
 To run the application, use the following command:
 
 mvn spring-boot:run
