@@ -38,7 +38,7 @@ public class LogoutServiceImpl implements LogoutHandler {
             tokenRepository.findByToken(jwt).ifPresentOrElse(
                     token -> {
                         if (!token.getTokenAccessType().equals(EnumTokenAccessType.ACCESS)) {
-                            throw new ForbiddenException(TOKEN_TYPE_INVALID);
+                            throw new ForbiddenException(INVALID_TOKEN_TYPE);
                         }
                         token.setExpired(true);
                         token.setRevoked(true);

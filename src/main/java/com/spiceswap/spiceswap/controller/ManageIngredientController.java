@@ -28,12 +28,12 @@ public class ManageIngredientController {
 
     @PostMapping("/add-ingredient")
     @Schema(name = "AddIngredientRequest", description = "Add Ingredient request body")
-    @Operation(summary = "Endpoint untuk menambahkan ingredient baru")
+    @Operation(summary = "Endpoint for adding new ingredient")
     public ResponseEntity<APIResultResponse<AdminIngredientResponse>> addNewIngredient(@RequestBody @Valid CreateIngredientRequest request) {
         AdminIngredientResponse response = ingredientService.addNewIngredient(request);
         APIResultResponse<AdminIngredientResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.CREATED,
-                "Berhasil menambahkan ingredient",
+                "Successfully added ingredient",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.CREATED);
@@ -41,13 +41,13 @@ public class ManageIngredientController {
 
     @PutMapping("/update-ingredient/{ingredientSlug}")
     @Schema(name = "UpdateIngredientRequest", description = "Update Ingredient request body")
-    @Operation(summary = "Endpoint untuk memperbarui ingredient")
+    @Operation(summary = "Endpoint for updating ingredient")
     public ResponseEntity<APIResultResponse<AdminIngredientResponse>> updateIngredient(@PathVariable String ingredientSlug,
                                                                                        @RequestBody @Valid UpdateIngredientRequest request) {
         AdminIngredientResponse response = ingredientService.updateIngredient(ingredientSlug, request);
         APIResultResponse<AdminIngredientResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memperbarui ingredient",
+                "Successfully updated ingredient",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -55,26 +55,26 @@ public class ManageIngredientController {
 
     @DeleteMapping("/delete-ingredient/{ingredientSlug}")
     @Schema(name = "DeleteIngredientRequest", description = "Delete Ingredient request body")
-    @Operation(summary = "Endpoint untuk menghapus ingredient")
+    @Operation(summary = "Endpoint to delete ingredient")
     public ResponseEntity<APIResponse> deleteIngredient(@PathVariable String ingredientSlug) {
         ingredientService.deleteIngredient(ingredientSlug);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.OK,
-                "Berhasil menghapus ingredient"
+                "Successfully deleted ingredient"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/get-ingredient")
     @Schema(name = "GetAllIngredientRequest", description = "Get All Ingredient request body")
-    @Operation(summary = "Endpoint untuk menampilkan dan mencari bahan-bahan")
+    @Operation(summary = "Endpoint for loading and searching for ingredients")
     public ResponseEntity<APIResultResponse<Page<AdminIngredientResponse>>> getAllIngredient(@RequestParam(value = "keyword", required = false) String keyword,
                                                                                              @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 24);
         Page<AdminIngredientResponse> responses = ingredientService.getAllIngredientForAdmin(keyword, pageable);
         APIResultResponse<Page<AdminIngredientResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat daftar bahan",
+                "Successfully loaded the ingredients list",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }

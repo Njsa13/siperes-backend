@@ -27,26 +27,26 @@ public class AdminUserController {
 
     @GetMapping
     @Schema(name = "GetAllUserRequest", description = "Get All User request body")
-    @Operation(summary = "Endpoint untuk memuat dan mencari user pada bagian admin")
+    @Operation(summary = "Endpoint for loading and searching for users in the admin section")
     public ResponseEntity<APIResultResponse<Page<AdminUserResponse>>> getAllUser(@RequestParam(value = "username", required = false) String username,
                                                                                  @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 12);
         Page<AdminUserResponse> responses = userService.getAllUserForAdmin(username, pageable);
         APIResultResponse<Page<AdminUserResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat daftar user",
+                "Successfully loaded user list",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @PutMapping("/status/{username}")
     @Schema(name = "ChangeStatusRequest", description = "Change Status request body")
-    @Operation(summary = "Endpoint untuk mengubah status user untuk admin")
+    @Operation(summary = "Endpoint to change user status to admin")
     public ResponseEntity<APIResultResponse<StatusResponse>> changeUserStatus(@PathVariable String username) {
         StatusResponse response = userService.changeUserStatus(username);
         APIResultResponse<StatusResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil mengganti status user",
+                "Successfully changed user status",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -54,12 +54,12 @@ public class AdminUserController {
 
     @GetMapping("/info")
     @Schema(name = "GetUsersInformationRequest", description = "Get Users Information request body")
-    @Operation(summary = "Endpoint untuk mengambil informasi statistik tentang user")
+    @Operation(summary = "Endpoint to retrieve statistical information about users")
     public ResponseEntity<APIResultResponse<UserInformation>> getRecipesInformation() {
         UserInformation response = userService.getUserInfo();
         APIResultResponse<UserInformation> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memuat informasi tentang user",
+                "Successfully loaded information about users",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);

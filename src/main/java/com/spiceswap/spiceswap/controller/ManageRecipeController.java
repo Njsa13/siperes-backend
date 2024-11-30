@@ -30,12 +30,12 @@ public class ManageRecipeController {
 
     @PostMapping("/add-recipe")
     @Schema(name = "AddRecipeRequest", description = "Add Recipe request body")
-    @Operation(summary = "Endpoint untuk membuat resep baru")
+    @Operation(summary = "Endpoint for add new recipe")
     public ResponseEntity<APIResultResponse<CreateRecipeResponse>> addRecipe(@RequestBody @Valid CreateRecipeRequest recipeRequest) {
         CreateRecipeResponse response = recipeService.addRecipe(recipeRequest);
         APIResultResponse<CreateRecipeResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.CREATED,
-                "Berhasil membuat resep",
+                "Successfully created the recipe",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.CREATED);
@@ -43,13 +43,13 @@ public class ManageRecipeController {
 
     @PutMapping("/update-recipe/{recipeSlug}")
     @Schema(name = "UpdateRecipeRequest", description = "Update Recipe request body")
-    @Operation(summary = "Endpoint untuk memperbarui resep")
+    @Operation(summary = "Endpoint for updating recipe")
     public ResponseEntity<APIResultResponse<UpdateRecipeResponse>> updateRecipe(@PathVariable String recipeSlug,
                                                                                 @RequestBody @Valid UpdateRecipeRequest recipeRequest) {
         UpdateRecipeResponse response = recipeService.updateRecipe(recipeSlug, recipeRequest);
         APIResultResponse<UpdateRecipeResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memperbarui resep",
+                "Successfully updated recipe",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -57,12 +57,12 @@ public class ManageRecipeController {
 
     @GetMapping("/update-recipe/{recipeSlug}")
     @Schema(name = "UpdateRecipeRequest", description = "Update Recipe request body")
-    @Operation(summary = "Endpoint untuk mengambil data resep sebelum update dilakukan")
+    @Operation(summary = "Endpoint to retrieve recipe data before updates")
     public ResponseEntity<APIResultResponse<UpdateRecipeResponse>> getUpdateRecipeDetail(@PathVariable String recipeSlug) {
         UpdateRecipeResponse response = recipeService.getUpdateRecipeDetail(recipeSlug);
         APIResultResponse<UpdateRecipeResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil mengambil data",
+                "Successfully retrieved data",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -70,13 +70,13 @@ public class ManageRecipeController {
 
     @PutMapping("/set-recipe/{recipeSlug}")
     @Schema(name = "SetRecipeRequest", description = "Set Recipe request body")
-    @Operation(summary = "Endpoint untuk mengubah pengaturan resep")
+    @Operation(summary = "Endpoint for changing recipe setting")
     public ResponseEntity<APIResultResponse<SetRecipeResponse>> setRecipe(@PathVariable String recipeSlug,
                                                                           @RequestBody @Valid SetRecipeRequest recipeRequest) {
         SetRecipeResponse response = recipeService.setRecipe(recipeSlug, recipeRequest);
         APIResultResponse<SetRecipeResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memperbarui pengaturan resep",
+                "Successfully updated recipe setting",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -84,12 +84,12 @@ public class ManageRecipeController {
 
     @GetMapping("/set-recipe/{recipeSlug}")
     @Schema(name = "SetRecipeRequest", description = "Set Recipe request body")
-    @Operation(summary = "Endpoint untuk mengambil data resep sebelum perubahan pengaturan dilakukan")
+    @Operation(summary = "Endpoint to retrieve recipe data before setting changes")
     public ResponseEntity<APIResultResponse<SetRecipeResponse>> getSettingRecipeDetail(@PathVariable String recipeSlug) {
         SetRecipeResponse response = recipeService.getSettingRecipeDetail(recipeSlug);
         APIResultResponse<SetRecipeResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil mengambil data",
+                "Successfully retrieved data",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -97,112 +97,112 @@ public class ManageRecipeController {
 
     @DeleteMapping("/delete-recipe/{recipeSlug}")
     @Schema(name = "DeleteRecipeRequest", description = "Delete Recipe request body")
-    @Operation(summary = "Endpoint untuk menghapus resep")
+    @Operation(summary = "Endpoint to delete a recipe")
     public ResponseEntity<APIResponse> deleteRecipe(@PathVariable String recipeSlug) {
         recipeService.deleteRecipe(recipeSlug);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.OK,
-                "Berhasil menghapus resep"
+                "Successfully deleted the recipe"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/get-all-my-recipes")
     @Schema(name = "GetAllMyRecipesRequest", description = "Get All My Recipes request body")
-    @Operation(summary = "Endpoint untuk mengambil daftar resep milik saya")
+    @Operation(summary = "Endpoint to retrieve my list of recipes")
     public ResponseEntity<APIResultResponse<Page<MyRecipeResponse>>> getAllMyRecipes(@RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 6);
         Page<MyRecipeResponse> responses = recipeService.getAllMyRecipes(pageable);
         APIResultResponse<Page<MyRecipeResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat resep saya",
+                "Successfully loaded my recipes list",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @GetMapping("/get-my-recipe-detail/{recipeSlug}")
     @Schema(name = "GetMyRecipeDetailRequest", description = "Get My Recipe Detail request body")
-    @Operation(summary = "Endpoint untuk mengambil detail resep milik saya")
+    @Operation(summary = "Endpoint to retrieve my recipe detail")
     public ResponseEntity<APIResultResponse<MyRecipeDetailResponse>> getMyRecipeDetail(@PathVariable String recipeSlug) {
         MyRecipeDetailResponse responses = recipeService.getMyRecipeDetail(recipeSlug);
         APIResultResponse<MyRecipeDetailResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat detail resep saya",
+                "Successfully loaded my recipe detail",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @GetMapping("/get-all-bookmarked-recipes")
     @Schema(name = "GetAllBookmarkedRecipesRequest", description = "Get All Bookmarked Recipes request body")
-    @Operation(summary = "Endpoint untuk mengambil daftar resep yang telah di bookmark")
+    @Operation(summary = "Endpoint to retrieve a list of bookmarked recipes")
     public ResponseEntity<APIResultResponse<Page<RecipeResponse>>> getAllBookmarkedRecipes(@RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 6);
         Page<RecipeResponse> responses = recipeService.getAllBookmarkedRecipes(pageable);
         APIResultResponse<Page<RecipeResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat resep yang telah di bookmark",
+                "Successfully loaded bookmarked recipe list",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @GetMapping("/get-all-my-recipe-history/{recipeSlug}")
     @Schema(name = "GetAllMyRecipeHistoryRequest", description = "Get ALl My Recipe History request body")
-    @Operation(summary = "Endpoint untuk mengambil daftar history resep milik sendiri")
+    @Operation(summary = "Endpoint to retrieve your own recipe history list")
     public ResponseEntity<APIResultResponse<RecipeHistoryListResponse>> getAllMyRecipeHistory(@PathVariable String recipeSlug,
                                                                                               @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
         RecipeHistoryListResponse responses = recipeService.getMyRecipeHistories(recipeSlug, pageable);
         APIResultResponse<RecipeHistoryListResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat riwayat resep saya",
+                "Successfully loaded my recipe history",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @GetMapping("/get-my-recipe-history-detail/{historySlug}")
     @Schema(name = "GetMyRecipeHistoryDetailRequest", description = "Get My Recipe History Detail request body")
-    @Operation(summary = "Endpoint untuk mengambil detail history resep milik sendiri")
+    @Operation(summary = "Endpoint to retrieve detail of your own recipe history")
     public ResponseEntity<APIResultResponse<RecipeHistoryDetailResponse>> getMyRecipeHistoryDetail(@PathVariable String historySlug) {
         RecipeHistoryDetailResponse responses = recipeService.getMyRecipeHistoryDetail(historySlug);
         APIResultResponse<RecipeHistoryDetailResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat detail riwayat resep saya",
+                "Successfully loaded the detail of my recipe history",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @PostMapping("/bookmark/{recipeSlug}")
     @Schema(name = "CreateBookmarkRequest", description = "Create Bookmark request body")
-    @Operation(summary = "Endpoint untuk membuat atau menambahkan bookmark")
+    @Operation(summary = "Endpoint for creating or adding bookmarks")
     public ResponseEntity<APIResponse> createBookmark(@PathVariable String recipeSlug) {
         recipeService.createBookmark(recipeSlug);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.CREATED,
-                "Berhasil menambahkan bookmark"
+                "Successfully added bookmark"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/bookmark/{recipeSlug}")
     @Schema(name = "DeleteBookmarkRequest", description = "Delete Bookmark request body")
-    @Operation(summary = "Endpoint untuk menghapus bookmark")
+    @Operation(summary = "Endpoint for deleting bookmark")
     public ResponseEntity<APIResponse> deleteBookmark(@PathVariable String recipeSlug) {
         recipeService.deleteBookmark(recipeSlug);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.OK,
-                "Berhasil menghapus bookmark"
+                "Successfully deleted bookmark"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @PostMapping("/copy-recipe/{recipeSlug}")
     @Schema(name = "CopyRecipeRequest", description = "Copy Recipe request body")
-    @Operation(summary = "Endpoint untuk membuat menyalin resep")
+    @Operation(summary = "Endpoint to create a recipe copy")
     public ResponseEntity<APIResultResponse<CreateRecipeResponse>> copyRecipe(@PathVariable String recipeSlug) {
         CreateRecipeResponse response = recipeService.copyRecipe(recipeSlug);
         APIResultResponse<CreateRecipeResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.CREATED,
-                "Berhasil menyalin resep",
+                "Successfully copied the recipe",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.CREATED);

@@ -28,26 +28,26 @@ public class OtherUserController {
 
     @GetMapping("/{username}")
     @Schema(name = "GetOtherUserProfileRequest", description = "Get Other User Profile request body")
-    @Operation(summary = "Endpoint untuk menampilkan data profile user lain")
+    @Operation(summary = "Endpoint to load other user profile data")
     public ResponseEntity<APIResultResponse<UserResponse>> getOtherUserProfile(@PathVariable String username) {
         UserResponse response = userService.getOtherUserProfile(username);
         APIResultResponse<UserResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat data user",
+                "Successfully loaded user data",
                 response);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{username}/recipe")
     @Schema(name = "GetOtherUserRecipeRequest", description = "Get Other User Recipe request body")
-    @Operation(summary = "Endpoint untuk menampilkan data resep milik user lain")
+    @Operation(summary = "Endpoint to load recipe data belonging to other users")
     public ResponseEntity<APIResultResponse<Page<RecipeResponse>>> getOtherUserRecipe(@PathVariable String username,
                                                                                       @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
         Page<RecipeResponse> responses = recipeService.getOtherUserRecipe(username, pageable);
         APIResultResponse<Page<RecipeResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat resep",
+                "Successfully loaded the recipe",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }

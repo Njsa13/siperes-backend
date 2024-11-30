@@ -162,7 +162,7 @@ public class RecipeReviewServiceImpl implements RecipeReviewService{
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(Constants.ErrorMessage.FAILED_DELETE_REVIEW);
+            throw new ServiceBusinessException(Constants.ErrorMessage.FAILED_GET_REVIEW_LIST);
         }
     }
 }

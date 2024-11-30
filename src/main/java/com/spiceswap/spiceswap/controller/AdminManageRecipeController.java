@@ -27,26 +27,26 @@ public class AdminManageRecipeController {
 
     @GetMapping
     @Schema(name = "GetAllRecipeRequest", description = "Get All Recipe request body")
-    @Operation(summary = "Endpoint untuk memuat dan mencari resep pada bagian admin")
+    @Operation(summary = "Endpoint for loading and searching for recipes in the admin section")
     public ResponseEntity<APIResultResponse<Page<AdminRecipeResponse>>> getAllRecipe(@RequestParam(value = "keyword", required = false) String keyword,
                                                                                      @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 12);
         Page<AdminRecipeResponse> responses = recipeService.getAllRecipeForAdmin(keyword, pageable);
         APIResultResponse<Page<AdminRecipeResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Behasil memuat daftar resep",
+                "Successfully loaded the recipe list",
                 responses);
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
     }
 
     @GetMapping("/detail/{recipeSlug}")
     @Schema(name = "GetRecipeDetailRequest", description = "Get Recipe Detail request body")
-    @Operation(summary = "Endpoint untuk memuat detail resep untuk admin")
+    @Operation(summary = "Endpoint to load recipe detail for admin")
     public ResponseEntity<APIResultResponse<RecipeDetailResponse>> getRecipeDetail(@PathVariable String recipeSlug) {
         RecipeDetailResponse response = recipeService.getRecipeDetailForAdmin(recipeSlug);
         APIResultResponse<RecipeDetailResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memuat detail resep",
+                "Successfully loaded recipe detail",
                 response
         );
         return new ResponseEntity<>(resultResponse,HttpStatus.OK);
@@ -54,12 +54,12 @@ public class AdminManageRecipeController {
 
     @PutMapping("/status/{recipeSlug}")
     @Schema(name = "ChangeStatusRequest", description = "Change Status request body")
-    @Operation(summary = "Endpoint untuk mengubah status resep untuk admin")
+    @Operation(summary = "Endpoint to change recipe status for admin")
     public ResponseEntity<APIResultResponse<StatusResponse>> changeRecipeStatus(@PathVariable String recipeSlug) {
         StatusResponse response = recipeService.changeRecipeStatus(recipeSlug);
         APIResultResponse<StatusResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil mengganti status resep",
+                "Successfully changed recipe status",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -67,12 +67,12 @@ public class AdminManageRecipeController {
 
     @GetMapping("/info")
     @Schema(name = "GetRecipesInformationRequest", description = "Get Recipes Information request body")
-    @Operation(summary = "Endpoint untuk mengambil informasi statistik tentang resep")
+    @Operation(summary = "Endpoint to retrieve statistical information about recipes")
     public ResponseEntity<APIResultResponse<RecipeInformation>> getRecipesInformation() {
         RecipeInformation response = recipeService.getRecipeInformation();
         APIResultResponse<RecipeInformation> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memuat informasi tentang resep",
+                "Successfully loaded information about recipes",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);

@@ -202,7 +202,7 @@ public class UserServiceImpl implements UserService{
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(Constants.ErrorMessage.FAILED_GET_DATA_USER);
+            throw new ServiceBusinessException(Constants.ErrorMessage.FAILED_GET_ALL_USER_DATA);
         }
     }
 
@@ -255,7 +255,7 @@ public class UserServiceImpl implements UserService{
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new ServiceBusinessException(Constants.ErrorMessage.FAILED_GET_USER_INFO);
+            throw new ServiceBusinessException(Constants.ErrorMessage.FAILED_GET_USER_INFORMATION);
         }
     }
 }

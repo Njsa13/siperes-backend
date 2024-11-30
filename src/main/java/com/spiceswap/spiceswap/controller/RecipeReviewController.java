@@ -28,12 +28,12 @@ public class RecipeReviewController {
 
     @PostMapping
     @Schema(name = "WriteRecipeReviewRequest", description = "Write Recipe Review request body")
-    @Operation(summary = "Endpoint untuk memberikan atau mengedit review resep")
+    @Operation(summary = "Endpoint for add or update recipe review")
     public ResponseEntity<APIResultResponse<WriteRecipeReviewResponse>> writeRecipeReview(@RequestBody @Valid CreateRecipeReviewRequest request) {
         WriteRecipeReviewResponse response = recipeReviewService.writeRecipeReview(request);
         APIResultResponse<WriteRecipeReviewResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil menambahkan ulasan resep",
+                "Successfully added recipe review",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -41,12 +41,12 @@ public class RecipeReviewController {
 
     @GetMapping
     @Schema(name = "GetMyRecipeReviewDetailRequest", description = "Get My Recipe Review Detail request body")
-    @Operation(summary = "Endpoint untuk mengambil detail review resep milik saya")
+    @Operation(summary = "Endpoint to load my recipe review detail")
     public ResponseEntity<APIResultResponse<RecipeReviewResponse>> getMyRecipeReviewDetail(@RequestParam("recipeSlug") String recipeSlug) {
         RecipeReviewResponse response = recipeReviewService.getWriteRecipeReviewDetail(recipeSlug);
         APIResultResponse<RecipeReviewResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memuat detail ulasan resep",
+                "Successfully loaded recipe review detail",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -54,26 +54,26 @@ public class RecipeReviewController {
 
     @DeleteMapping("/delete")
     @Schema(name = "DeleteRecipeReviewRequest", description = "Delete Recipe Review request body")
-    @Operation(summary = "Endpoint untuk menghapus review resep milik saya")
+    @Operation(summary = "Endpoint to delete my recipe review")
     public ResponseEntity<APIResponse> deleteRecipeReview(@RequestParam("recipeSlug") String recipeSlug) {
         recipeReviewService.deleteRecipeReview(recipeSlug);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.OK,
-                "Berhasil menghapus resep review"
+                "Successfully deleted review recipe"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/list")
     @Schema(name = "GetAllRecipeReviewRequest", description = "Get All Recipe Review request body")
-    @Operation(summary = "Endpoint untuk mengambil daftar review resep")
+    @Operation(summary = "Endpoint to load a list of recipe reviews")
     public ResponseEntity<APIResultResponse<Page<RecipeReviewResponse>>> getAllRecipeReview(@RequestParam("recipeSlug") String recipeSlug,
                                                                                             @RequestParam("page") Integer page) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<RecipeReviewResponse> responses = recipeReviewService.getAllRecipeReview(recipeSlug, pageable);
         APIResultResponse<Page<RecipeReviewResponse>> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Berhasil memuat daftar ulasan resep",
+                "Successfully loaded recipe review list",
                 responses
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);

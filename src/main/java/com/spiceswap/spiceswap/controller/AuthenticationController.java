@@ -35,12 +35,12 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @Schema(name = "RegisterRequest", description = "Register request body")
-    @Operation(summary = "Endpoint untuk register akun baru")
+    @Operation(summary = "Endpoint for registering a new account")
     public ResponseEntity<APIResultResponse<RegisterResponse>> register(@RequestBody @Valid RegisterRequest request) {
         RegisterResponse response = authenticationService.register(request);
         APIResultResponse<RegisterResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.CREATED,
-                "Daftar berhasil",
+                "Registration successful",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.CREATED);
@@ -48,12 +48,12 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @Schema(name = "LoginRequest", description = "Login request body")
-    @Operation(summary = "Endpoint untuk login, credential dapat berupa username/email")
+    @Operation(summary = "Endpoint for login, credentials can be username/email")
     public ResponseEntity<APIResultResponse<LoginResponse>> login(@RequestBody @Valid LoginRequest request) {
         LoginResponse response = authenticationService.login(request);
         APIResultResponse<LoginResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.OK,
-                "Login berhasil",
+                "Login successful",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.OK);
@@ -61,48 +61,48 @@ public class AuthenticationController {
 
     @PostMapping("/email-verify-register")
     @Schema(name = "VerifyEmailRequest", description = "Verify email request body")
-    @Operation(summary = "Endpoint untuk verifikasi email")
+    @Operation(summary = "Endpoint for email verification")
     public ResponseEntity<APIResponse> verifyEmailRegister(@RequestParam String token) {
         emailVerificationService.verifyEmailRegister(token);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
-                "Email berhasil diverifikasi"
+                "Email successfully verified"
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/send-email-verify-register")
     @Schema(name = "SendVerifyEmailRequest", description = "Send verify email request body")
-    @Operation(summary = "Endpoint untuk mengirim email berisi url untuk verifikasi, credential dapat berupa username/email")
+    @Operation(summary = "Endpoint to send email containing URL for verification, credentials can be username/email")
     public ResponseEntity<APIResponse> sendVerificationEmailRegister(@RequestBody @Valid SendEmailVerificationRequest request) {
         emailVerificationService.sendEmail(request.getCredential(), EnumEmailVerificationType.REGISTER);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
-                "Email verifikasi berhasil dikirim"
+                "The verification email was sent successfully"
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/resend-email-verify-register")
     @Schema(name = "ResendVerifyEmailRequest", description = "Resend verify email request body")
-    @Operation(summary = "Endpoint untuk mengirim ulang email berisi url untuk verifikasi")
+    @Operation(summary = "Endpoint to resend email containing url for verification")
     public ResponseEntity<APIResponse> resendVerificationEmailRegister(@RequestBody @Valid ResendEmailVerificationRequest request) {
         emailVerificationService.resendVerificationEmailRegister(request.getToken(), EnumEmailVerificationType.REGISTER);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
-                "Email verifikasi berhasil dikirim ulang"
+                "The verification email was successfully resent"
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/refresh-token")
     @Schema(name = "RefreshTokenRequest", description = "Refresh token request body")
-    @Operation(summary = "Endpoint me-refresh token akses")
+    @Operation(summary = "Endpoint for refreshing access tokens")
     public ResponseEntity<APIResultResponse<RefreshTokenResponse>> refreshToken() {
         RefreshTokenResponse response = authenticationService.refreshToken();
         APIResultResponse<RefreshTokenResponse> resultResponse = new APIResultResponse<>(
                 HttpStatus.CREATED,
-                "Refresh token berhasil",
+                "Token refresh successful",
                 response
         );
         return new ResponseEntity<>(resultResponse, HttpStatus.CREATED);
@@ -110,36 +110,36 @@ public class AuthenticationController {
 
     @PostMapping("/logout")
     @Schema(name = "LogoutRequest", description = "Logout request body")
-    @Operation(summary = "Endpoint untuk logout, catatan: header juga dihapus ketika logout")
+    @Operation(summary = "Endpoint for logout, note: headers are also removed when logged out")
     public ResponseEntity<APIResponse> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         logoutHandler.logout(request, response, authentication);
         APIResponse responseDTO = new APIResponse(
                 HttpStatus.OK,
-                "Logout berhasil"
+                "Logout successful"
         );
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @PostMapping("/send-email-forgot-password")
     @Schema(name = "ForgotPasswordEmailRequest", description = "Forgot password email request body")
-    @Operation(summary = "Endpoint untuk lupa password")
+    @Operation(summary = "Endpoint for forgot password")
     public ResponseEntity<APIResponse> forgotPasswordEmail(@RequestBody @Valid ForgotPasswordRequest request) {
         emailVerificationService.sendEmail(request.getEmail(), EnumEmailVerificationType.FORGOT_PASSWORD);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
-                "Email ganti password berhasil dikirim"
+                "The password change email was sent successfully"
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/email-verify-forgot-password")
     @Schema(name = "VerifyForgotPasswordEmailRequest", description = "Verify forgot password email request body")
-    @Operation(summary = "Endpoint untuk verifikasi ganti password ketika lupa password")
+    @Operation(summary = "Endpoint for verifying password change when forgotten password")
     public ResponseEntity<APIResponse> verifyForgotPasswordEmail(@RequestBody @Valid ResetPasswordRequest request) {
         emailVerificationService.verifyEmailTokenForgotPassword(request);
         APIResponse response = new APIResponse(
                 HttpStatus.OK,
-                "Password berhasil direset"
+                "Password successfully reset"
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

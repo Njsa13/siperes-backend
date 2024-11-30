@@ -124,7 +124,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 Token token = tokenRepository.findByToken(refreshToken)
                         .orElseThrow(() -> new DataNotFoundException(TOKEN_NOT_FOUND));
                 if (!token.getTokenAccessType().equals(EnumTokenAccessType.REFRESH)) {
-                    throw new ForbiddenException(TOKEN_TYPE_INVALID);
+                    throw new ForbiddenException(INVALID_TOKEN_TYPE);
                 }
             } else {
                 throw new ForbiddenException(INVALID_TOKEN);
