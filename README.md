@@ -14,7 +14,7 @@ cd spiceswap-backend
 mvn clean install
 ```
 ## Configuration
-Configure the application by inserting the necessary information for PostgreSQL, JWT, SMTP Gmail, and Cloudinary into the `env.properties`.
+Configure the application by inserting the necessary information into the `env.properties` file, including configuration details for PostgreSQL, JWT, SMTP Gmail, and Cloudinary.
 
 ```bash
 # Database Configuration
