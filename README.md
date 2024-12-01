@@ -1,4 +1,4 @@
-﻿# Programming Project Course Assignments - SpiceSwap Backend app
+﻿# Programming Project Course Assignments - SpiceSwap Backend App
 
 ## Overview
 
