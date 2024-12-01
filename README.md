@@ -47,7 +47,7 @@ cloudinary.api-secret=your-api-secret
 
 ## API Documentation
 
-The API documentation is generated using Swagger. Access the documentation by visiting [http://localhost:8080/docs](http://localhost:8080/docs) or [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) after running the application.
+The API documentation is generated using Swagger. Access the documentation by visiting [http://localhost:8080/docs](http://localhost:8080/docs) after running the application.
 
 ```bash
 # Usage
